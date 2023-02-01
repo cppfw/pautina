@@ -7,6 +7,8 @@
 
 #include <opros/wait_set.hpp>
 
+#include "connection.hpp"
+
 namespace pautina{
 
 class connection_thread : public nitki::thread{
@@ -17,6 +19,9 @@ class connection_thread : public nitki::thread{
     opros::wait_set wait_set;
 
     bool quit_flag = false;
+
+    pautina::connection connection;
+
 public:
     connection_thread(setka::tcp_socket&& socket);
     ~connection_thread();

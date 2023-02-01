@@ -6,7 +6,7 @@ connection_thread::connection_thread(setka::tcp_socket&& socket) :
     socket(std::move(socket)),
     wait_set(2)
 {
-    this->wait_set.add(this->socket, opros::ready::read | opros::ready::write);
+    this->wait_set.add(this->socket, opros::ready::read);
     this->wait_set.add(this->queue, opros::ready::read);
 }
 
@@ -26,7 +26,15 @@ void connection_thread::run(){
         }
 
         if(this->socket.flags().get(opros::ready::read)){
-            // TODO: read
+            constexpr const size_t receive_buffer_size = 0x1000; // 4kb
+            std::array<uint8_t, receive_buffer_size> buf;
+
+            while(size_t num_bytes_received = this->socket.recieve(buf)){
+                ASSERT(num_bytes_received > 0)
+                if(!this->connection.on_data_received(utki::make_span(buf.data(), num_bytes_received))){
+                    // TODO:
+                }
+            }
         }
 
         if(this->socket.flags().get(opros::ready::write)){
