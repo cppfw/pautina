@@ -29,9 +29,9 @@ void connection_thread::run(){
             constexpr const size_t receive_buffer_size = 0x1000; // 4kb
             std::array<uint8_t, receive_buffer_size> buf;
 
-            while(size_t num_bytes_received = this->socket.recieve(buf)){
+            while(size_t num_bytes_received = this->socket.receive(buf)){
                 ASSERT(num_bytes_received > 0)
-                if(!this->connection.on_data_received(utki::make_span(buf.data(), num_bytes_received))){
+                if(!this->connection.handle_received_data(utki::make_span(buf.data(), num_bytes_received))){
                     // TODO:
                 }
             }
