@@ -1,32 +1,31 @@
 #pragma once
 
-#include <nitki/thread.hpp>
 #include <nitki/queue.hpp>
-
-#include <setka/tcp_socket.hpp>
-
+#include <nitki/thread.hpp>
 #include <opros/wait_set.hpp>
+#include <setka/tcp_socket.hpp>
 
 #include "connection.hpp"
 
-namespace pautina{
+namespace pautina {
 
-class connection_thread : public nitki::thread{
-    setka::tcp_socket socket;
+class connection_thread : public nitki::thread
+{
+	setka::tcp_socket socket;
 
-    nitki::queue queue;
+	nitki::queue queue;
 
-    opros::wait_set wait_set;
+	opros::wait_set wait_set;
 
-    bool quit_flag = false;
+	bool quit_flag = false;
 
-    pautina::connection connection;
+	pautina::connection connection;
 
 public:
-    connection_thread(setka::tcp_socket&& socket);
-    ~connection_thread();
+	connection_thread(setka::tcp_socket&& socket);
+	~connection_thread();
 
-    void run()override;
+	void run() override;
 };
 
-}
+} // namespace pautina
