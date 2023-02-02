@@ -6,7 +6,10 @@ connection_thread::connection_thread(setka::tcp_socket&& socket) :
 	wait_set(2),
 	connection(std::make_unique<pautina::connection>(std::move(socket)))
 {
-	this->wait_set.add(this->connection->socket, opros::ready::read); // TODO: what if adding fails, catch exception? Deinit gracefully.
+	this->wait_set.add(
+		this->connection->socket,
+		opros::ready::read
+	); // TODO: what if adding fails, catch exception? Deinit gracefully.
 	this->wait_set.add(this->queue, opros::ready::read);
 
 	this->connection->socket.user_data = this->connection.get();
@@ -35,7 +38,9 @@ void connection_thread::run()
 
 			while (size_t num_bytes_received = this->connection->socket.receive(buf)) {
 				ASSERT(num_bytes_received > 0)
-				if (!this->connection->handle_received_data(utki::make_span(buf.data(), num_bytes_received))) {
+				this->connection->handle_received_data(utki::make_span(buf.data(), num_bytes_received));
+				if (this->connection->state() == connection::state::sending) {
+					// state has changed to 'sending'
 					// TODO:
 				}
 			}
