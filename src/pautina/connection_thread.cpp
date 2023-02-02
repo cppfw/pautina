@@ -3,17 +3,19 @@
 using namespace pautina;
 
 connection_thread::connection_thread(setka::tcp_socket&& socket) :
-	socket(std::move(socket)),
-	wait_set(2)
+	wait_set(2),
+	connection(std::make_unique<pautina::connection>(std::move(socket)))
 {
-	this->wait_set.add(this->socket, opros::ready::read);
+	this->wait_set.add(this->connection->socket, opros::ready::read); // TODO: what if adding fails, catch exception? Deinit gracefully.
 	this->wait_set.add(this->queue, opros::ready::read);
+
+	this->connection->socket.user_data = this->connection.get();
 }
 
 connection_thread::~connection_thread()
 {
 	this->wait_set.remove(this->queue);
-	this->wait_set.remove(this->socket);
+	this->wait_set.remove(this->connection->socket);
 }
 
 void connection_thread::run()
@@ -27,19 +29,19 @@ void connection_thread::run()
 			}
 		}
 
-		if (this->socket.flags().get(opros::ready::read)) {
+		if (this->connection->socket.flags().get(opros::ready::read)) {
 			constexpr const size_t receive_buffer_size = 0x1000; // 4kb
 			std::array<uint8_t, receive_buffer_size> buf;
 
-			while (size_t num_bytes_received = this->socket.receive(buf)) {
+			while (size_t num_bytes_received = this->connection->socket.receive(buf)) {
 				ASSERT(num_bytes_received > 0)
-				if (!this->connection.handle_received_data(utki::make_span(buf.data(), num_bytes_received))) {
+				if (!this->connection->handle_received_data(utki::make_span(buf.data(), num_bytes_received))) {
 					// TODO:
 				}
 			}
 		}
 
-		if (this->socket.flags().get(opros::ready::write)) {
+		if (this->connection->socket.flags().get(opros::ready::write)) {
 			// TODO: write
 		}
 	}

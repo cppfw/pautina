@@ -11,15 +11,13 @@ namespace pautina {
 
 class connection_thread : public nitki::thread
 {
-	setka::tcp_socket socket;
-
 	nitki::queue queue;
 
 	opros::wait_set wait_set;
 
 	bool quit_flag = false;
 
-	pautina::connection connection;
+	std::unique_ptr<pautina::connection> connection;
 
 public:
 	connection_thread(setka::tcp_socket&& socket);
