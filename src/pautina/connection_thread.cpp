@@ -33,6 +33,10 @@ void connection_thread::run()
 		}
 
 		if (this->connection->socket.flags().get(opros::ready::read)) {
+			if (this->connection->state() != connection::state::receiving) {
+				// TODO: illegal state, handle the error
+			}
+
 			constexpr const size_t receive_buffer_size = 0x1000; // 4kb
 			std::array<uint8_t, receive_buffer_size> buf;
 
@@ -41,7 +45,8 @@ void connection_thread::run()
 				this->connection->handle_received_data(utki::make_span(buf.data(), num_bytes_received));
 				if (this->connection->state() == connection::state::sending) {
 					// state has changed to 'sending'
-					// TODO:
+					this->wait_set.change(this->connection->socket, opros::ready::write);
+					break;
 				}
 			}
 		}
