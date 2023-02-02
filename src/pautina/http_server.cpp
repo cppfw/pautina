@@ -35,6 +35,8 @@ void http_server::run()
 
 		if (this->accept_socket.flags().get(opros::ready::read)) {
 			auto socket = this->accept_socket.accept();
+
+			std::cout << "connection accepted" << std::endl;
 			// TODO: accept connection
 		}
 	}

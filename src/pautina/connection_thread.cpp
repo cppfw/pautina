@@ -75,7 +75,30 @@ void connection_thread::run()
 				case connection::state::sending:
 					{
 						ASSERT(c->socket.flags().get(opros::ready::write))
-						// TODO:
+
+						ASSERT(c->num_bytes_sent < c->data_to_send.size())
+
+						auto span = utki::make_span(
+							c->data_to_send.data() + c->num_bytes_sent,
+							c->data_to_send.size() - c->num_bytes_sent
+						);
+
+						size_t num_bytes_sent = c->socket.send(span);
+
+						ASSERT(num_bytes_sent <= span.size())
+
+						if (num_bytes_sent == span.size()) {
+							c->data_to_send.clear();
+							c->num_bytes_sent = 0;
+
+							c->handle_all_data_sent();
+							if (c->state() == connection::state::receiving) {
+								// state has changed to 'receiving'
+								this->wait_set.change(c->socket, opros::ready::read);
+							}
+						} else {
+							c->num_bytes_sent += num_bytes_sent;
+						}
 					}
 					break;
 			}

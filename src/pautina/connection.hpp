@@ -34,7 +34,7 @@ public:
 
 	void handle_received_data(utki::span<const uint8_t> data);
 
-	std::vector<uint8_t> get_data_to_send();
+	void handle_all_data_sent();
 };
 
 } // namespace pautina
