@@ -22,6 +22,10 @@ public:
 private:
 	state current_state = state::receiving;
 
+	// stuff used in 'sending' state
+	std::vector<uint8_t> data_to_send;
+	size_t num_bytes_sent;
+
 public:
 	state state() const noexcept
 	{
