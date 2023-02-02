@@ -10,6 +10,12 @@
             "group": "build"
         },
         {
+            "label": "build-asan",
+            "type": "shell",
+            "command": "make config=asan",
+            "group": "build"
+        },
+        {
             "label": "format",
             "type": "shell",
             "command": "make apply-format",

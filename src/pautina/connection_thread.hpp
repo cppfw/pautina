@@ -21,7 +21,7 @@ class connection_thread : public nitki::thread
 
 public:
 	connection_thread(setka::tcp_socket&& socket);
-	~connection_thread();
+	~connection_thread()override;
 
 	void run() override;
 };
