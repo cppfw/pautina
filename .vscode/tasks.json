@@ -26,6 +26,12 @@
             "type": "shell",
             "command": "make apply-format",
             "group": "build"
+        },
+        {
+            "label": "clean-all",
+            "type": "shell",
+            "command": "make clean-all",
+            "group": "build"
         }
     ]
 }
