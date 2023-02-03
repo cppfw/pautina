@@ -14,6 +14,8 @@ class connection
 public:
 	connection(setka::tcp_socket&& socket);
 
+	~connection();
+
 	enum class state {
 		receiving,
 		sending

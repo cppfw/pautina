@@ -6,23 +6,25 @@ namespace {
 constexpr const size_t waitset_size = 2;
 } // namespace
 
-connection_thread::connection_thread(setka::tcp_socket&& socket) :
+connection_thread::connection_thread(http_server& owner, setka::tcp_socket&& socket) :
+	owner(owner),
 	wait_set(waitset_size),
 	connection(std::make_unique<pautina::connection>(std::move(socket)))
 {
+	this->wait_set.add(this->queue, opros::ready::read);
+
 	this->wait_set.add(
 		this->connection->socket,
 		opros::ready::read
 	); // TODO: what if adding fails, catch exception? Deinit gracefully.
-	this->wait_set.add(this->queue, opros::ready::read);
 
 	this->connection->socket.user_data = this->connection.get();
 }
 
 connection_thread::~connection_thread()
 {
-	this->wait_set.remove(this->queue);
 	this->wait_set.remove(this->connection->socket);
+	this->wait_set.remove(this->queue);
 }
 
 void connection_thread::run()
@@ -48,6 +50,7 @@ void connection_thread::run()
 			}
 
 			// if we get here, then the triggered waitable is a tcp_socket
+			ASSERT(waitable->user_data)
 			auto c = reinterpret_cast<pautina::connection*>(waitable->user_data);
 
 			switch (c->state()) {
@@ -104,4 +107,9 @@ void connection_thread::run()
 			}
 		}
 	}
+}
+
+void connection_thread::quit(){
+	this->quit_flag = true;
+	this->queue.push_back([](){});
 }

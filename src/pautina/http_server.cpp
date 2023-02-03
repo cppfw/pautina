@@ -39,7 +39,13 @@ void http_server::run()
 			auto socket = this->accept_socket.accept();
 
 			LOG([](auto&o){o << "connection accepted" << std::endl;})
-			// TODO: accept connection
+			this->spawn_thread(std::move(socket));
 		}
 	}
+}
+
+void http_server::spawn_thread(setka::tcp_socket&& socket){
+	auto& thread = this->threads.emplace_back(*this, std::move(socket));
+	thread.owner_iter = std::prev(this->threads.end());
+	thread.start();
 }

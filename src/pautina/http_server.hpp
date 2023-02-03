@@ -1,10 +1,12 @@
 #pragma once
 
-#include <functional>
 #include <string>
+#include <list>
 
 #include <nitki/queue.hpp>
 #include <setka/tcp_server_socket.hpp>
+
+#include "connection_thread.hpp"
 
 namespace pautina {
 
@@ -18,6 +20,9 @@ class http_server
 
 	volatile bool quit_flag = false;
 
+	std::list<connection_thread> threads;
+
+	void spawn_thread(setka::tcp_socket&& socket);
 public:
 	struct configuration{
 		uint16_t port = 80;
