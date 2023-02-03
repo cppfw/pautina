@@ -19,7 +19,11 @@ class http_server
 	volatile bool quit_flag = false;
 
 public:
-	http_server();
+	struct configuration{
+		uint16_t port = 80;
+	};
+
+	http_server(configuration config);
 	~http_server();
 
 	void add(std::vector<std::string> path, std::function<void()> handler);

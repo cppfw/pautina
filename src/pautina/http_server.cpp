@@ -2,10 +2,12 @@
 
 using namespace pautina;
 
-http_server::http_server() :
+http_server::http_server(configuration config) :
 	wait_set(2)
 {
-	this->wait_set.add(this->accept_socket, opros::ready::read);
+	this->accept_socket.open(config.port); // TODO: use guard to close the socket
+
+	this->wait_set.add(this->accept_socket, opros::ready::read); // TODO: use gaurd?
 	this->wait_set.add(this->queue, opros::ready::read);
 }
 
