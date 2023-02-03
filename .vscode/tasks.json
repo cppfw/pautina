@@ -32,6 +32,12 @@
             "type": "shell",
             "command": "make clean-all",
             "group": "build"
+        },
+        {
+            "label": "run-app-dbg",
+            "type": "shell",
+            "command": "make run-app config=dbg",
+            "group": "build"
         }
     ]
 }
