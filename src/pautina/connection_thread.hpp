@@ -30,7 +30,6 @@ SOFTWARE.
 
 #include <nitki/loop_thread.hpp>
 #include <nitki/queue.hpp>
-#include <nitki/thread.hpp>
 #include <opros/wait_set.hpp>
 #include <setka/tcp_socket.hpp>
 
