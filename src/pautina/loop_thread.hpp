@@ -45,6 +45,7 @@ public:
 	opros::wait_set wait_set;
 
 	loop_thread(unsigned wait_set_capacity);
+	~loop_thread();
 
 	void run() override;
 

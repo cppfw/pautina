@@ -34,23 +34,18 @@ SOFTWARE.
 #include <setka/tcp_socket.hpp>
 
 #include "connection.hpp"
+#include "loop_thread.hpp"
 
 namespace pautina {
 
 class http_server;
 
-class connection_thread : public nitki::thread
+class connection_thread : public nitki::loop_thread
 {
 	friend class http_server;
 
 	http_server& owner;
 	std::list<connection_thread>::iterator owner_iter;
-
-	nitki::queue queue;
-
-	opros::wait_set wait_set;
-
-	bool quit_flag = false;
 
 	std::unique_ptr<pautina::connection> connection;
 
@@ -58,9 +53,7 @@ public:
 	connection_thread(http_server& owner, setka::tcp_socket&& socket);
 	~connection_thread() override;
 
-	void run() override;
-
-	void quit();
+	std::optional<uint32_t> on_loop(utki::span<opros::event_info> triggered) override;
 };
 
 } // namespace pautina

@@ -28,22 +28,12 @@ SOFTWARE.
 
 using namespace pautina;
 
-namespace {
-constexpr const size_t waitset_size = 2;
-} // namespace
-
 connection_thread::connection_thread(http_server& owner, setka::tcp_socket&& socket) :
+	nitki::loop_thread(1),
 	owner(owner),
-	wait_set(waitset_size),
 	connection(std::make_unique<pautina::connection>(std::move(socket)))
 {
-	this->wait_set.add(this->queue, opros::ready::read);
-
-	this->wait_set.add(
-		this->connection->socket,
-		opros::ready::read
-	); // TODO: what if adding fails, catch
-	   // exception? Deinit gracefully.
+	this->wait_set.add(this->connection->socket, opros::ready::read);
 
 	this->connection->socket.user_data = this->connection.get();
 }
@@ -51,89 +41,68 @@ connection_thread::connection_thread(http_server& owner, setka::tcp_socket&& soc
 connection_thread::~connection_thread()
 {
 	this->wait_set.remove(this->connection->socket);
-	this->wait_set.remove(this->queue);
 }
 
-void connection_thread::run()
+std::optional<uint32_t> connection_thread::on_loop(utki::span<opros::event_info> triggered)
 {
-	std::vector<opros::event_info> triggered(waitset_size);
-	while (!this->quit_flag) {
-		ASSERT(this->wait_set.size() <= triggered.size())
-		size_t num_triggered = this->wait_set.wait(triggered);
-		ASSERT(num_triggered <= triggered.size())
+	for (auto& t : triggered) {
+		if (!t.object->user_data) {
+			continue;
+		}
 
-		for (size_t i = 0; i != num_triggered; ++i) {
-			const auto& waitable = triggered[i];
-			ASSERT(waitable.object)
+		// waitable is a tcp_socket
+		auto c = reinterpret_cast<pautina::connection*>(t.object->user_data);
 
-			// check if it is a procedure queue
-			if (waitable.object == static_cast<opros::waitable*>(&this->queue)) {
-				ASSERT(waitable.flags.get(opros::ready::read))
-				while (auto proc = this->queue.pop_front()) {
-					proc.operator()();
+		switch (c->state()) {
+			case connection::state::receiving:
+				{
+					ASSERT(t.flags.get(opros::ready::read))
+
+					constexpr const size_t receive_buffer_size = 0x1000; // 4kb
+					std::array<uint8_t, receive_buffer_size> buf;
+
+					while (size_t num_bytes_received = c->socket.receive(buf)) {
+						ASSERT(num_bytes_received > 0)
+						c->handle_received_data(utki::make_span(buf.data(), num_bytes_received));
+						if (c->state() == connection::state::sending) {
+							// state has changed to 'sending'
+							this->wait_set.change(c->socket, opros::ready::write);
+							break;
+						}
+					}
 				}
-				continue;
-			}
+				break;
+			case connection::state::sending:
+				{
+					ASSERT(t.flags.get(opros::ready::write))
 
-			// if we get here, then the triggered waitable is a tcp_socket
-			ASSERT(waitable.object->user_data)
-			auto c = reinterpret_cast<pautina::connection*>(waitable.object->user_data);
+					ASSERT(c->num_bytes_sent < c->data_to_send.size())
 
-			switch (c->state()) {
-				case connection::state::receiving:
-					{
-						ASSERT(waitable.flags.get(opros::ready::read))
+					auto span = utki::make_span(
+						c->data_to_send.data() + c->num_bytes_sent,
+						c->data_to_send.size() - c->num_bytes_sent
+					);
 
-						constexpr const size_t receive_buffer_size = 0x1000; // 4kb
-						std::array<uint8_t, receive_buffer_size> buf;
+					size_t num_bytes_sent = c->socket.send(span);
 
-						while (size_t num_bytes_received = c->socket.receive(buf)) {
-							ASSERT(num_bytes_received > 0)
-							c->handle_received_data(utki::make_span(buf.data(), num_bytes_received));
-							if (c->state() == connection::state::sending) {
-								// state has changed to 'sending'
-								this->wait_set.change(c->socket, opros::ready::write);
-								break;
-							}
+					ASSERT(num_bytes_sent <= span.size())
+
+					if (num_bytes_sent == span.size()) {
+						c->data_to_send.clear();
+						c->num_bytes_sent = 0;
+
+						c->handle_all_data_sent();
+						if (c->state() == connection::state::receiving) {
+							// state has changed to 'receiving'
+							this->wait_set.change(c->socket, opros::ready::read);
 						}
+					} else {
+						c->num_bytes_sent += num_bytes_sent;
 					}
-					break;
-				case connection::state::sending:
-					{
-						ASSERT(waitable.flags.get(opros::ready::write))
-
-						ASSERT(c->num_bytes_sent < c->data_to_send.size())
-
-						auto span = utki::make_span(
-							c->data_to_send.data() + c->num_bytes_sent,
-							c->data_to_send.size() - c->num_bytes_sent
-						);
-
-						size_t num_bytes_sent = c->socket.send(span);
-
-						ASSERT(num_bytes_sent <= span.size())
-
-						if (num_bytes_sent == span.size()) {
-							c->data_to_send.clear();
-							c->num_bytes_sent = 0;
-
-							c->handle_all_data_sent();
-							if (c->state() == connection::state::receiving) {
-								// state has changed to 'receiving'
-								this->wait_set.change(c->socket, opros::ready::read);
-							}
-						} else {
-							c->num_bytes_sent += num_bytes_sent;
-						}
-					}
-					break;
-			}
+				}
+				break;
 		}
 	}
-}
 
-void connection_thread::quit()
-{
-	this->quit_flag = true;
-	this->queue.push_back([]() {});
+	return {};
 }

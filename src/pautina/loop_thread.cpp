@@ -42,7 +42,14 @@ loop_thread::loop_thread(unsigned wait_set_capacity) :
 		}
 		return wait_set_capacity + 1;
 	}())
-{}
+{
+	this->wait_set.add(this->queue, opros::ready::read);
+}
+
+loop_thread::~loop_thread()
+{
+	this->wait_set.remove(this->queue);
+}
 
 void loop_thread::quit() noexcept
 {
