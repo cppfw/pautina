@@ -12,11 +12,11 @@ namespace pautina {
 
 class http_server
 {
-	setka::tcp_server_socket accept_socket;
-
 	nitki::queue queue;
 
 	opros::wait_set wait_set;
+
+	setka::tcp_server_socket accept_socket;
 
 	volatile bool quit_flag = false;
 

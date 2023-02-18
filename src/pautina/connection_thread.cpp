@@ -29,34 +29,33 @@ connection_thread::~connection_thread()
 
 void connection_thread::run()
 {
-	std::vector<opros::waitable*> triggered(waitset_size);
+	std::vector<opros::event_info> triggered(waitset_size);
 	while (!this->quit_flag) {
 		ASSERT(this->wait_set.size() <= triggered.size())
 		size_t num_triggered = this->wait_set.wait(triggered);
 		ASSERT(num_triggered <= triggered.size())
 
 		for (size_t i = 0; i != num_triggered; ++i) {
-			auto waitable = triggered[i];
-			ASSERT(waitable)
+			const auto& waitable = triggered[i];
+			ASSERT(waitable.object)
 
 			// check if it is a procedure queue
-			if (waitable == static_cast<opros::waitable*>(&this->queue)) {
-				ASSERT(this->queue.flags().get(opros::ready::read))
+			if (waitable.object == static_cast<opros::waitable*>(&this->queue)) {
+				ASSERT(waitable.flags.get(opros::ready::read))
 				while (auto proc = this->queue.pop_front()) {
 					proc.operator()();
 				}
-				ASSERT(!this->queue.flags().get(opros::ready::read))
 				continue;
 			}
 
 			// if we get here, then the triggered waitable is a tcp_socket
-			ASSERT(waitable->user_data)
-			auto c = reinterpret_cast<pautina::connection*>(waitable->user_data);
+			ASSERT(waitable.object->user_data)
+			auto c = reinterpret_cast<pautina::connection*>(waitable.object->user_data);
 
 			switch (c->state()) {
 				case connection::state::receiving:
 					{
-						ASSERT(c->socket.flags().get(opros::ready::read))
+						ASSERT(waitable.flags.get(opros::ready::read))
 
 						constexpr const size_t receive_buffer_size = 0x1000; // 4kb
 						std::array<uint8_t, receive_buffer_size> buf;
@@ -70,14 +69,11 @@ void connection_thread::run()
 								break;
 							}
 						}
-
-						// read flag should be cleared by the receive() call
-						ASSERT(!c->socket.flags().get(opros::ready::read))
 					}
 					break;
 				case connection::state::sending:
 					{
-						ASSERT(c->socket.flags().get(opros::ready::write))
+						ASSERT(waitable.flags.get(opros::ready::write))
 
 						ASSERT(c->num_bytes_sent < c->data_to_send.size())
 
