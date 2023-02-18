@@ -26,41 +26,41 @@ SOFTWARE.
 
 #pragma once
 
-#include <list>
+#include <atomic>
+#include <optional>
 
-#include <nitki/queue.hpp>
 #include <nitki/thread.hpp>
+#include <nitki/queue.hpp>
 #include <opros/wait_set.hpp>
-#include <setka/tcp_socket.hpp>
 
-#include "connection.hpp"
+namespace nitki{
 
-namespace pautina {
+class loop_thread : public nitki::thread{
+    nitki::queue queue;
 
-class http_server;
-
-class connection_thread : public nitki::thread
-{
-	friend class http_server;
-
-	http_server& owner;
-	std::list<connection_thread>::iterator owner_iter;
-
-	nitki::queue queue;
-
-	opros::wait_set wait_set;
-
-	bool quit_flag = false;
-
-	std::unique_ptr<pautina::connection> connection;
+    std::atomic_bool quit_flag = false;
 
 public:
-	connection_thread(http_server& owner, setka::tcp_socket&& socket);
-	~connection_thread() override;
+    opros::wait_set wait_set;
 
-	void run() override;
+    loop_thread(unsigned wait_set_capacity);
 
-	void quit();
+    void run()override;
+
+    /**
+     * @brief Loop iteration procedure.
+     * This function is called every main loop iteration, right after
+     * handling thread's queue.
+     * @param triggered - triggered waitable objects of wait_set.
+     * @return desired triggering objects waiting timeout in milliseconds for next iteration.
+     * @return empty std::optional for infinite waiting for triggering objects.
+     */
+    virtual std::optional<uint32_t> on_loop(utki::span<opros::event_info> triggered) = 0;
+
+    /**
+     * @brief Request this thread to quit.
+     */
+    void quit()noexcept;
 };
 
-} // namespace pautina
+}
