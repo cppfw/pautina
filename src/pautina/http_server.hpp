@@ -26,8 +26,8 @@ SOFTWARE.
 
 #pragma once
 
-#include <string>
 #include <list>
+#include <string>
 
 #include <nitki/queue.hpp>
 #include <setka/tcp_server_socket.hpp>
@@ -49,8 +49,9 @@ class http_server
 	std::list<connection_thread> threads;
 
 	void spawn_thread(setka::tcp_socket&& socket);
+
 public:
-	struct configuration{
+	struct configuration {
 		uint16_t port = 80;
 	};
 

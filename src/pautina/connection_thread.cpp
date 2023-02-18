@@ -42,7 +42,8 @@ connection_thread::connection_thread(http_server& owner, setka::tcp_socket&& soc
 	this->wait_set.add(
 		this->connection->socket,
 		opros::ready::read
-	); // TODO: what if adding fails, catch exception? Deinit gracefully.
+	); // TODO: what if adding fails, catch
+	   // exception? Deinit gracefully.
 
 	this->connection->socket.user_data = this->connection.get();
 }
@@ -131,7 +132,8 @@ void connection_thread::run()
 	}
 }
 
-void connection_thread::quit(){
+void connection_thread::quit()
+{
 	this->quit_flag = true;
-	this->queue.push_back([](){});
+	this->queue.push_back([]() {});
 }

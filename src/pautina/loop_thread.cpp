@@ -31,36 +31,39 @@ SOFTWARE.
 using namespace nitki;
 
 loop_thread::loop_thread(unsigned wait_set_capacity) :
-    wait_set([&](){
-        auto max = std::numeric_limits<decltype(wait_set_capacity)>::max();
-        if(wait_set_capacity == std::numeric_limits<decltype(wait_set_capacity)>::max()){
-            std::stringstream ss;
-            ss << "loop_thread::loop_thread(): wait_set_capacity must be less than " << max;
-            throw std::invalid_argument(ss.str());
-        }
-        return wait_set_capacity + 1;
-    }())
+	wait_set([&]() {
+		auto max = std::numeric_limits<decltype(wait_set_capacity)>::max();
+		if (wait_set_capacity == std::numeric_limits<decltype(wait_set_capacity)>::max()) {
+			std::stringstream ss;
+			ss << "loop_thread::loop_thread(): wait_set_capacity must be less "
+				  "than "
+			   << max;
+			throw std::invalid_argument(ss.str());
+		}
+		return wait_set_capacity + 1;
+	}())
 {}
 
-void loop_thread::quit()noexcept{
-    this->quit_flag.store(true);
-    this->queue.poke();
+void loop_thread::quit() noexcept
+{
+	this->quit_flag.store(true);
+	this->queue.poke();
 }
 
-void loop_thread::run(){
-    std::vector<opros::event_info> triggered(this->wait_set.capacity());
+void loop_thread::run()
+{
+	std::vector<opros::event_info> triggered(this->wait_set.capacity());
 
-    std::optional<uint32_t> timeout = this->on_loop(nullptr);
+	std::optional<uint32_t> timeout = this->on_loop(nullptr);
 
-    while(!this->quit_flag.load()){
-        auto num_triggered = timeout.has_value() ?
-            this->wait_set.wait(timeout.value(), triggered) :
-                this->wait_set.wait(triggered);
+	while (!this->quit_flag.load()) {
+		auto num_triggered =
+			timeout.has_value() ? this->wait_set.wait(timeout.value(), triggered) : this->wait_set.wait(triggered);
 
-        while(auto proc = this->queue.pop_front()){
-            proc.operator()();
-        }
+		while (auto proc = this->queue.pop_front()) {
+			proc.operator()();
+		}
 
-        timeout = this->on_loop(utki::make_span(triggered.data(), num_triggered));
-    }
+		timeout = this->on_loop(utki::make_span(triggered.data(), num_triggered));
+	}
 }

@@ -29,38 +29,40 @@ SOFTWARE.
 #include <atomic>
 #include <optional>
 
-#include <nitki/thread.hpp>
 #include <nitki/queue.hpp>
+#include <nitki/thread.hpp>
 #include <opros/wait_set.hpp>
 
-namespace nitki{
+namespace nitki {
 
-class loop_thread : public nitki::thread{
-    nitki::queue queue;
+class loop_thread : public nitki::thread
+{
+	nitki::queue queue;
 
-    std::atomic_bool quit_flag = false;
+	std::atomic_bool quit_flag = false;
 
 public:
-    opros::wait_set wait_set;
+	opros::wait_set wait_set;
 
-    loop_thread(unsigned wait_set_capacity);
+	loop_thread(unsigned wait_set_capacity);
 
-    void run()override;
+	void run() override;
 
-    /**
-     * @brief Loop iteration procedure.
-     * This function is called every main loop iteration, right after
-     * handling thread's queue.
-     * @param triggered - triggered waitable objects of wait_set.
-     * @return desired triggering objects waiting timeout in milliseconds for next iteration.
-     * @return empty std::optional for infinite waiting for triggering objects.
-     */
-    virtual std::optional<uint32_t> on_loop(utki::span<opros::event_info> triggered) = 0;
+	/**
+	 * @brief Loop iteration procedure.
+	 * This function is called every main loop iteration, right after
+	 * handling thread's queue.
+	 * @param triggered - triggered waitable objects of wait_set.
+	 * @return desired triggering objects waiting timeout in milliseconds for next
+	 * iteration.
+	 * @return empty std::optional for infinite waiting for triggering objects.
+	 */
+	virtual std::optional<uint32_t> on_loop(utki::span<opros::event_info> triggered) = 0;
 
-    /**
-     * @brief Request this thread to quit.
-     */
-    void quit()noexcept;
+	/**
+	 * @brief Request this thread to quit.
+	 */
+	void quit() noexcept;
 };
 
-}
+} // namespace nitki
