@@ -42,18 +42,37 @@ class loop_thread : public nitki::thread
 	std::atomic_bool quit_flag = false;
 
 public:
+	/**
+	 * @brief wait_set of the thread.
+	 * This is the wait set of waitable objects for whose readiness the
+	 * thread waits on each iteration of the main loop.
+	 */
 	opros::wait_set wait_set;
 
+	/**
+	 * @brief Construct a new loop thread object.
+	 *
+	 * @param wait_set_capacity - requested capasity of the thread's wait_set.
+	 */
 	loop_thread(unsigned wait_set_capacity);
+
 	~loop_thread();
 
-	void run() override;
+	/**
+	 * @brief Main loop of the thread.
+	 * The run() method is overridden to implement main loop with procedure queue
+	 * and quit flag.
+	 */
+	void run() override final;
 
 	/**
 	 * @brief Loop iteration procedure.
 	 * This function is called every main loop iteration, right after
 	 * handling thread's queue.
-	 * @param triggered - triggered waitable objects of wait_set.
+	 * This function is also called once right before entering the main loop
+	 * to get the first waiting timeout, the list of triggered waitable objects
+	 * in this case is empty.
+	 * @param triggered - list of triggered waitable objects of the wait_set.
 	 * @return desired triggering objects waiting timeout in milliseconds for next
 	 * iteration.
 	 * @return empty std::optional for infinite waiting for triggering objects.
