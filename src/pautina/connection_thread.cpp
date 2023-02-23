@@ -61,7 +61,9 @@ std::optional<uint32_t> connection_thread::on_loop(utki::span<opros::event_info>
 
 		// check for error condition
 		if (t.flags.get(opros::ready::error)) {
-			LOG([](auto&o){o << "socket error" << std::endl;})
+			LOG([](auto& o) {
+				o << "socket error" << std::endl;
+			})
 			this->owner.reclaim_thread(*this);
 			return {};
 		}
@@ -91,14 +93,17 @@ std::optional<uint32_t> connection_thread::on_loop(utki::span<opros::event_info>
 						if (first_read) {
 							// zero bytes received right after the object has become ready to read,
 							// this means that the connection was reset by peer
-							LOG([](auto&o){o << "connection reset by peer, quit thread!" << std::endl;})
+							LOG([](auto& o) {
+								o << "connection reset by peer, quit thread!" << std::endl;
+							})
 							// destroy thread
 							this->owner.reclaim_thread(*this);
 							break;
 						}
 					} catch (std::exception& e) {
-						LOG([&](auto&o){o << "std::exception caught while receiving data from socket: " << e.what()
-								  << std::endl;})
+						LOG([&](auto& o) {
+							o << "std::exception caught while receiving data from socket: " << e.what() << std::endl;
+						})
 					}
 				}
 				break;
