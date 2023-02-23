@@ -26,6 +26,8 @@ SOFTWARE.
 
 #include "connection.hpp"
 
+#include <utki/string.hpp>
+
 using namespace pautina;
 
 connection::connection(setka::tcp_socket&& socket) :
@@ -39,8 +41,8 @@ void connection::handle_all_data_sent()
 
 void connection::handle_received_data(utki::span<const uint8_t> data)
 {
-	LOG([](auto& o) {
-		o << "connection::handle_received_data(): " << std::endl;
+	LOG([&](auto& o) {
+		o << "connection::handle_received_data(): " << utki::make_string(data) << std::endl;
 	})
 	// TODO:
 }

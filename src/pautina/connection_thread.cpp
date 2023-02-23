@@ -26,6 +26,8 @@ SOFTWARE.
 
 #include "connection_thread.hpp"
 
+#include "http_server.hpp"
+
 using namespace pautina;
 
 connection_thread::connection_thread(http_server& owner, setka::tcp_socket&& socket) :
@@ -41,16 +43,29 @@ connection_thread::connection_thread(http_server& owner, setka::tcp_socket&& soc
 connection_thread::~connection_thread()
 {
 	this->wait_set.remove(this->connection->socket);
+	LOG([](auto& o) {
+		o << "connection_thread destroyed" << std::endl;
+	})
 }
 
 std::optional<uint32_t> connection_thread::on_loop(utki::span<opros::event_info> triggered)
 {
 	for (auto& t : triggered) {
 		if (!t.object->user_data) {
+			// waitbale is a nitki::queue, skip it
 			continue;
 		}
 
 		// waitable is a tcp_socket
+		// std::cout << "socket ready: " << t.flags << std::endl;
+
+		// check for error condition
+		if (t.flags.get(opros::ready::error)) {
+			LOG([](auto&o){o << "socket error" << std::endl;})
+			this->owner.reclaim_thread(*this);
+			return {};
+		}
+
 		auto c = reinterpret_cast<pautina::connection*>(t.object->user_data);
 
 		switch (c->state()) {
@@ -61,14 +76,29 @@ std::optional<uint32_t> connection_thread::on_loop(utki::span<opros::event_info>
 					constexpr const size_t receive_buffer_size = 0x1000; // 4kb
 					std::array<uint8_t, receive_buffer_size> buf;
 
-					while (size_t num_bytes_received = c->socket.receive(buf)) {
-						ASSERT(num_bytes_received > 0)
-						c->handle_received_data(utki::make_span(buf.data(), num_bytes_received));
-						if (c->state() == connection::state::sending) {
-							// state has changed to 'sending'
-							this->wait_set.change(c->socket, opros::ready::write);
+					try {
+						bool first_read = true;
+						while (size_t num_bytes_received = c->socket.receive(buf)) {
+							first_read = false;
+							ASSERT(num_bytes_received > 0)
+							c->handle_received_data(utki::make_span(buf.data(), num_bytes_received));
+							if (c->state() == connection::state::sending) {
+								// state has changed to 'sending'
+								this->wait_set.change(c->socket, opros::ready::write);
+								break;
+							}
+						}
+						if (first_read) {
+							// zero bytes received right after the object has become ready to read,
+							// this means that the connection was reset by peer
+							LOG([](auto&o){o << "connection reset by peer, quit thread!" << std::endl;})
+							// destroy thread
+							this->owner.reclaim_thread(*this);
 							break;
 						}
+					} catch (std::exception& e) {
+						LOG([&](auto&o){o << "std::exception caught while receiving data from socket: " << e.what()
+								  << std::endl;})
 					}
 				}
 				break;

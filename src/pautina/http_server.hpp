@@ -29,26 +29,24 @@ SOFTWARE.
 #include <list>
 #include <string>
 
-#include <nitki/queue.hpp>
+#include <nitki/loop_thread.hpp>
 #include <setka/tcp_server_socket.hpp>
 
 #include "connection_thread.hpp"
 
 namespace pautina {
 
-class http_server
+class http_server : public nitki::loop_thread
 {
-	nitki::queue queue;
-
-	opros::wait_set wait_set;
+	friend class connection_thread;
 
 	setka::tcp_server_socket accept_socket;
-
-	volatile bool quit_flag = false;
 
 	std::list<connection_thread> threads;
 
 	void spawn_thread(setka::tcp_socket&& socket);
+
+	void reclaim_thread(connection_thread& t);
 
 public:
 	struct configuration {
@@ -60,9 +58,7 @@ public:
 
 	void add(std::vector<std::string> path, std::function<void()> handler);
 
-	void run();
-
-	void quit();
+	std::optional<uint32_t> on_loop(utki::span<opros::event_info> triggered) override;
 };
 
 } // namespace pautina
