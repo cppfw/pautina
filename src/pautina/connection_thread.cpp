@@ -35,9 +35,7 @@ connection_thread::connection_thread(http_server& owner, setka::tcp_socket&& soc
 	owner(owner),
 	connection(std::make_unique<pautina::connection>(std::move(socket)))
 {
-	this->wait_set.add(this->connection->socket, opros::ready::read);
-
-	this->connection->socket.user_data = this->connection.get();
+	this->wait_set.add(this->connection->socket, opros::ready::read, this->connection.get());
 }
 
 connection_thread::~connection_thread()
@@ -48,10 +46,10 @@ connection_thread::~connection_thread()
 	})
 }
 
-std::optional<uint32_t> connection_thread::on_loop(utki::span<opros::event_info> triggered)
+std::optional<uint32_t> connection_thread::on_loop()
 {
-	for (auto& t : triggered) {
-		if (!t.object->user_data) {
+	for (auto& t : this->wait_set.get_triggered()) {
+		if (!t.user_data) {
 			// waitbale is a nitki::queue, skip it
 			continue;
 		}
@@ -68,7 +66,7 @@ std::optional<uint32_t> connection_thread::on_loop(utki::span<opros::event_info>
 			return {};
 		}
 
-		auto c = reinterpret_cast<pautina::connection*>(t.object->user_data);
+		auto c = reinterpret_cast<pautina::connection*>(t.user_data);
 
 		switch (c->state()) {
 			case connection::state::receiving:
@@ -86,7 +84,7 @@ std::optional<uint32_t> connection_thread::on_loop(utki::span<opros::event_info>
 							c->handle_received_data(utki::make_span(buf.data(), num_bytes_received));
 							if (c->state() == connection::state::sending) {
 								// state has changed to 'sending'
-								this->wait_set.change(c->socket, opros::ready::write);
+								this->wait_set.change(c->socket, opros::ready::write, c);
 								break;
 							}
 						}
@@ -129,7 +127,7 @@ std::optional<uint32_t> connection_thread::on_loop(utki::span<opros::event_info>
 						c->handle_all_data_sent();
 						if (c->state() == connection::state::receiving) {
 							// state has changed to 'receiving'
-							this->wait_set.change(c->socket, opros::ready::read);
+							this->wait_set.change(c->socket, opros::ready::read, c);
 						}
 					} else {
 						c->num_bytes_sent += num_bytes_sent;

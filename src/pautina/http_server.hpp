@@ -58,7 +58,7 @@ public:
 
 	void add(std::vector<std::string> path, std::function<void()> handler);
 
-	std::optional<uint32_t> on_loop(utki::span<opros::event_info> triggered) override;
+	std::optional<uint32_t> on_loop() override;
 };
 
 } // namespace pautina

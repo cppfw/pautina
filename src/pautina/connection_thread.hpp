@@ -52,7 +52,7 @@ public:
 	connection_thread(http_server& owner, setka::tcp_socket&& socket);
 	~connection_thread() override;
 
-	std::optional<uint32_t> on_loop(utki::span<opros::event_info> triggered) override;
+	std::optional<uint32_t> on_loop() override;
 };
 
 } // namespace pautina

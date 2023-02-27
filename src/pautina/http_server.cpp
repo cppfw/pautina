@@ -32,7 +32,7 @@ http_server::http_server(configuration config) :
 	nitki::loop_thread(1),
 	accept_socket(config.port)
 {
-	this->wait_set.add(this->accept_socket, opros::ready::read);
+	this->wait_set.add(this->accept_socket, opros::ready::read, &this->accept_socket);
 }
 
 http_server::~http_server()
@@ -40,12 +40,10 @@ http_server::~http_server()
 	this->wait_set.remove(this->accept_socket);
 }
 
-std::optional<uint32_t> http_server::on_loop(utki::span<opros::event_info> triggered)
+std::optional<uint32_t> http_server::on_loop()
 {
-	for (unsigned i = 0; i != triggered.size(); ++i) {
-		auto& w = triggered[i];
-
-		if (w.object == &this->accept_socket) {
+	for (const auto& t : this->wait_set.get_triggered()) {
+		if (t.user_data == &this->accept_socket) {
 			auto socket = this->accept_socket.accept();
 
 			LOG([](auto& o) {
