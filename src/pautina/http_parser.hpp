@@ -11,8 +11,9 @@ namespace pautina{
 class http_parser{
     enum class state{
         idle,
+        skip_spaces,
         method,
-        // path,
+        path,
         // protocol,
         // header_name,
         // header_value,
@@ -20,10 +21,13 @@ class http_parser{
     };
 
     state cur_state = state::idle;
+    state state_after_skiping_spaces;
 
     std::vector<char> buf;
 
     std::string_view parse_idle(std::string_view str);
+    std::string_view parse_skip_spaces(std::string_view str);
+    std::string_view parse_method(std::string_view str);
 public:
     http::protocol protocol;
     http::method method;
