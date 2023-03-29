@@ -4,9 +4,11 @@
 
 int main(int argc, const char** argv)
 {
-	pautina::http_server server({8080});
+	uint16_t port = 8080;
 
-	std::cout << "app: server is running" << std::endl;
+	pautina::http_server server({port});
+
+	std::cout << "app: server is listening on port " << port << std::endl;
 
 	server.run();
 
