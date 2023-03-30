@@ -65,15 +65,15 @@ std::string_view pautina::http::protocol_to_string(protocol p) noexcept
 
 namespace {
 const std::map<std::string_view, method> method_name_to_enum_mapping = {
-	{    "GET",			 method::get},
-	{   "HEAD",            method::head},
-	{   "POST",            method::post},
-	{    "PUT",			 method::put},
-	{ "DELETE", method::delete_resource},
-	{"CONNECT",         method::connect},
-	{"OPTIONS",         method::options},
-	{  "TRACE",           method::trace},
-	{  "PATCH",           method::patch}
+	{    "GET",       method::get},
+	{   "HEAD",      method::head},
+	{   "POST",      method::post},
+	{    "PUT",       method::put},
+	{ "DELETE", method::delete_nk},
+	{"CONNECT",   method::connect},
+	{"OPTIONS",   method::options},
+	{  "TRACE",     method::trace},
+	{  "PATCH",     method::patch}
 };
 
 const auto method_enum_to_name_mapping = utki::flip_map(method_name_to_enum_mapping);

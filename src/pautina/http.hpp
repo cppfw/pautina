@@ -59,7 +59,7 @@ enum class method {
 	head,
 	post,
 	put,
-	delete_resource,
+	delete_nk,
 	connect,
 	options,
 	trace,
