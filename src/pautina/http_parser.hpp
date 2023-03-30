@@ -52,7 +52,6 @@ class http_parser
 
 	std::vector<char> buf;
 
-	std::string_view parse_idle(std::string_view str);
 	std::string_view parse_skip_spaces(std::string_view str);
 	std::string_view parse_method(std::string_view str);
 	std::string_view parse_path(std::string_view str);
