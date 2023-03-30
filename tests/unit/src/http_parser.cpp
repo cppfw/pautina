@@ -73,6 +73,19 @@ tst::set set("http_parser", [](tst::suite& suite){
             "GET / HTT",
             "GET / HTTP/1.1",
             "GET / HTTP/1.1\n",
+            "GET / HTTP/1.1" "\n"
+                "Ho",
+            "GET / HTTP/1.1" "\n"
+                "Host:",
+            "GET / HTTP/1.1" "\n"
+                "Host: ",
+            "GET / HTTP/1.1" "\n"
+                "Host: localhost:8080" "\n"
+                "User-Agent: curl/",
+            "GET / HTTP/1.1" "\n"
+                "Host: localhost:8080" "\n"
+                "User-Agent: curl/7.74.0" "\n"
+                "Accept: */*" "\n",
         },
         [](const auto& p){
             pautina::http_parser parser;
