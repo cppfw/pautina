@@ -56,7 +56,7 @@ std::string_view http_parser::parse_method(std::string_view str)
 
 		if (c == ' ') {
 			// method name read
-			this->method = http::method_from_string(utki::make_string_view(this->buf));
+			this->request.method = http::method_from_string(utki::make_string_view(this->buf));
 
 			this->buf.clear();
 
@@ -79,7 +79,7 @@ std::string_view http_parser::parse_path(std::string_view str)
 		auto c = *i;
 
 		if (c == ' ') {
-			this->path = utki::make_string(this->buf);
+			this->request.path = utki::make_string(this->buf);
 			this->buf.clear();
 			this->cur_state = state::skip_spaces;
 			this->state_after_skiping_spaces = state::protocol;
@@ -102,7 +102,7 @@ std::string_view http_parser::parse_protocol(std::string_view str)
 		auto c = *i;
 
 		if (c == '\n') {
-			this->protocol = http::protocol_from_string(utki::make_string_view(this->buf));
+			this->request.protocol = http::protocol_from_string(utki::make_string_view(this->buf));
 
 			this->buf.clear();
 
@@ -138,7 +138,7 @@ std::string_view http_parser::feed(std::string_view str)
 			case state::headers:
 				str = this->headers_parser.feed(str);
 				if (this->headers_parser.is_end()) {
-					this->headers = std::move(this->headers_parser.headers);
+					this->request.headers = std::move(this->headers_parser.headers);
 					this->cur_state = state::end;
 					return str;
 				}

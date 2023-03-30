@@ -32,7 +32,7 @@ SOFTWARE.
 #include <vector>
 
 #include "headers_parser.hpp"
-#include "http.hpp"
+#include "request.hpp"
 
 namespace pautina {
 
@@ -62,11 +62,7 @@ class http_parser
 	http::headers_parser headers_parser;
 
 public:
-	http::protocol protocol;
-	http::method method;
-	std::string path;
-
-	http::headers headers;
+	http::request request;
 
 	/**
 	 * @brief Feed text portion to parse.

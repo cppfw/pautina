@@ -4,14 +4,14 @@
 #include <pautina/http/request_parser.hpp>
 
 namespace{
-std::string print_parsed_http_header(const pautina::http_parser& p){
+std::string print_parsed_http_request(const pautina::http::request& r){
     std::stringstream ss;
 
-    ss << "method = " << pautina::http::method_to_string(p.method) << std::endl;
-    ss << "path = " << p.path << std::endl;
-    ss << "protocol = " << pautina::http::protocol_to_string(p.protocol) << std::endl;
+    ss << "method = " << pautina::http::method_to_string(r.method) << std::endl;
+    ss << "path = " << r.path << std::endl;
+    ss << "protocol = " << pautina::http::protocol_to_string(r.protocol) << std::endl;
 
-    for(const auto& h : p.headers.get_map()){
+    for(const auto& h : r.headers.get_map()){
         ss << "name: " << h.first << std::endl;
         ss << "value: " << h.second << std::endl;
     }
@@ -58,7 +58,7 @@ tst::set set("http__request_parser", [](tst::suite& suite){
 
             tst::check(parser.is_end(), SL) << "header = \n" << p.first;
 
-            auto res = print_parsed_http_header(parser);
+            auto res = print_parsed_http_request(parser.request);
 
             tst::check_eq(res, p.second, SL);
         }
