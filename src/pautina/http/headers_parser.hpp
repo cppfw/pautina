@@ -26,63 +26,45 @@ SOFTWARE.
 
 #pragma once
 
-#include <map>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "http/headers_parser.hpp"
-#include "http/http.hpp"
+namespace pautina::http {
 
-namespace pautina {
-
-class http_parser
+class headers_parser
 {
 	enum class state {
 		skip_spaces,
-		method,
-		path,
-		protocol,
-		header_name,
-		header_value,
+		name,
+		value,
 		end
 	};
 
-	state cur_state = state::method;
+	state cur_state = state::name;
 	state state_after_skiping_spaces;
 
-	std::vector<char> buf;
+	std::vector<char> buf; // for storing currently parsed string
 
 	std::string_view parse_skip_spaces(std::string_view str);
-	std::string_view parse_method(std::string_view str);
-	std::string_view parse_path(std::string_view str);
-	std::string_view parse_protocol(std::string_view str);
 	std::string_view parse_header_name(std::string_view str);
 	std::string_view parse_header_value(std::string_view str);
 
 	std::string header_name; // for storing header name until header value is parsed
 
 public:
-	http::protocol protocol;
-	http::method method;
-	std::string path;
-
-	http::headers_parser headers_parser;
-
-	std::map<std::string, std::string> headers;
-
 	/**
 	 * @brief Feed text portion to parse.
 	 * @param str - portion of text to parse.
 	 * @return std::string_view remained after parsing. It can be non-empty in case
-	 *     HTTP header end has been encountered in the middle of the fed data.
-	 * @throw std::invalid_argument in case of malformed HTTP header.
+	 *     HTTP headers end has been encountered in the middle of the fed data.
+	 * @throw std::invalid_argument in case of malformed HTTP headers.
 	 */
 	std::string_view feed(std::string_view str);
 
 	/**
-	 * @brief Check if end of HTTP header is reached.
-	 * @return true if end of HTTP header is reached.
+	 * @brief Check if end of HTTP headers is reached.
+	 * @return true if end of HTTP headers is reached.
 	 * @return false otherwise.
 	 */
 	bool is_end() const noexcept
@@ -91,4 +73,4 @@ public:
 	}
 };
 
-} // namespace pautina
+} // namespace pautina::http
