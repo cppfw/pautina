@@ -41,6 +41,11 @@ public:
 	void add(std::string&& name, std::string&& value);
 
 	std::optional<std::string_view> get(std::string_view name) const noexcept;
+
+	const decltype(hdrs)& get_map() const noexcept
+	{
+		return this->hdrs;
+	}
 };
 
 } // namespace pautina::http

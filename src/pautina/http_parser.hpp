@@ -43,8 +43,7 @@ class http_parser
 		method,
 		path,
 		protocol,
-		header_name,
-		header_value,
+		headers,
 		end
 	};
 
@@ -57,8 +56,6 @@ class http_parser
 	std::string_view parse_method(std::string_view str);
 	std::string_view parse_path(std::string_view str);
 	std::string_view parse_protocol(std::string_view str);
-	std::string_view parse_header_name(std::string_view str);
-	std::string_view parse_header_value(std::string_view str);
 
 	std::string header_name; // for storing header name until header value is parsed
 
@@ -68,8 +65,6 @@ public:
 	std::string path;
 
 	http::headers_parser headers_parser;
-
-	std::map<std::string, std::string> headers;
 
 	/**
 	 * @brief Feed text portion to parse.

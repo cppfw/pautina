@@ -30,6 +30,8 @@ SOFTWARE.
 #include <string_view>
 #include <vector>
 
+#include "headers.hpp"
+
 namespace pautina::http {
 
 class headers_parser
@@ -47,12 +49,14 @@ class headers_parser
 	std::vector<char> buf; // for storing currently parsed string
 
 	std::string_view parse_skip_spaces(std::string_view str);
-	std::string_view parse_header_name(std::string_view str);
-	std::string_view parse_header_value(std::string_view str);
+	std::string_view parse_name(std::string_view str);
+	std::string_view parse_value(std::string_view str);
 
 	std::string header_name; // for storing header name until header value is parsed
 
 public:
+	http::headers headers;
+
 	/**
 	 * @brief Feed text portion to parse.
 	 * @param str - portion of text to parse.

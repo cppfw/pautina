@@ -26,4 +26,86 @@ SOFTWARE.
 
 #include "headers_parser.hpp"
 
+#include <utki/string.hpp>
+
 using namespace pautina::http;
+
+std::string_view headers_parser::parse_skip_spaces(std::string_view str)
+{
+	auto i = str.begin();
+	for (; i != str.end(); ++i) {
+		auto c = *i;
+		if (c != ' ') {
+			this->cur_state = this->state_after_skiping_spaces;
+			break;
+		}
+	}
+	str = str.substr(std::distance(str.begin(), i));
+	return str;
+}
+
+std::string_view headers_parser::parse_name(std::string_view str)
+{
+	auto i = str.begin();
+	for (; i != str.end(); ++i) {
+		auto c = *i;
+
+		if (c == ':') {
+			this->header_name = utki::make_string(this->buf);
+			this->buf.clear();
+
+			this->cur_state = state::skip_spaces;
+			this->state_after_skiping_spaces = state::value;
+			++i;
+			break;
+		} else if (c == '\n' && this->buf.empty()) {
+			// end of HTTP request header
+			this->cur_state = state::end;
+			break;
+		}
+
+		this->buf.push_back(c);
+	}
+	str = str.substr(std::distance(str.begin(), i));
+	return str;
+}
+
+std::string_view headers_parser::parse_value(std::string_view str)
+{
+	auto i = str.begin();
+	for (; i != str.end(); ++i) {
+		auto c = *i;
+
+		if (c == '\n') {
+			this->headers.add(std::move(this->header_name), utki::make_string(this->buf));
+			this->buf.clear();
+			this->cur_state = state::name;
+			++i;
+			break;
+		}
+
+		this->buf.push_back(c);
+	}
+	str = str.substr(std::distance(str.begin(), i));
+	return str;
+}
+
+std::string_view headers_parser::feed(std::string_view str)
+{
+	while (!str.empty()) {
+		switch (this->cur_state) {
+			case state::skip_spaces:
+				str = this->parse_skip_spaces(str);
+				break;
+			case state::name:
+				str = this->parse_name(str);
+				break;
+			case state::value:
+				str = this->parse_value(str);
+				break;
+			case state::end:
+				return str;
+		}
+	}
+	return str;
+}

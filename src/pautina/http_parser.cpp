@@ -106,56 +106,7 @@ std::string_view http_parser::parse_protocol(std::string_view str)
 
 			this->buf.clear();
 
-			this->cur_state = state::header_name;
-			++i;
-			break;
-		}
-
-		this->buf.push_back(c);
-	}
-	str = str.substr(std::distance(str.begin(), i));
-	return str;
-}
-
-std::string_view http_parser::parse_header_name(std::string_view str)
-{
-	auto i = str.begin();
-	for (; i != str.end(); ++i) {
-		auto c = *i;
-
-		if (c == ':') {
-			this->header_name = utki::make_string(this->buf);
-			this->buf.clear();
-
-			this->cur_state = state::skip_spaces;
-			this->state_after_skiping_spaces = state::header_value;
-			++i;
-			break;
-		} else if (c == '\n' && this->buf.empty()) {
-			// end of HTTP request header
-			this->cur_state = state::end;
-			break;
-		}
-
-		this->buf.push_back(c);
-	}
-	str = str.substr(std::distance(str.begin(), i));
-	return str;
-}
-
-std::string_view http_parser::parse_header_value(std::string_view str)
-{
-	auto i = str.begin();
-	for (; i != str.end(); ++i) {
-		auto c = *i;
-
-		if (c == '\n') {
-			auto value = utki::make_string(this->buf);
-			this->buf.clear();
-
-			this->headers.insert_or_assign(std::move(this->header_name), std::move(value));
-
-			this->cur_state = state::header_name;
+			this->cur_state = state::headers;
 			++i;
 			break;
 		}
@@ -184,11 +135,12 @@ std::string_view http_parser::feed(std::string_view str)
 				// std::cout << "feed(): str = " << str << std::endl;
 				str = this->parse_protocol(str);
 				break;
-			case state::header_name:
-				str = this->parse_header_name(str);
-				break;
-			case state::header_value:
-				str = this->parse_header_value(str);
+			case state::headers:
+				str = this->headers_parser.feed(str);
+				if (this->headers_parser.is_end()) {
+					this->cur_state = state::end;
+					return str;
+				}
 				break;
 			case state::end:
 				return str;

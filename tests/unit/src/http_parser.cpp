@@ -11,7 +11,7 @@ std::string print_parsed_http_header(const pautina::http_parser& p){
     ss << "path = " << p.path << std::endl;
     ss << "protocol = " << pautina::http::protocol_to_string(p.protocol) << std::endl;
 
-    for(const auto& h : p.headers){
+    for(const auto& h : p.headers_parser.headers.get_map()){
         ss << "name: " << h.first << std::endl;
         ss << "value: " << h.second << std::endl;
     }
