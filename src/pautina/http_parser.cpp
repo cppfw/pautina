@@ -138,6 +138,7 @@ std::string_view http_parser::feed(std::string_view str)
 			case state::headers:
 				str = this->headers_parser.feed(str);
 				if (this->headers_parser.is_end()) {
+					this->headers = std::move(this->headers_parser.headers);
 					this->cur_state = state::end;
 					return str;
 				}

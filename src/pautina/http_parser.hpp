@@ -59,12 +59,14 @@ class http_parser
 
 	std::string header_name; // for storing header name until header value is parsed
 
+	http::headers_parser headers_parser;
+
 public:
 	http::protocol protocol;
 	http::method method;
 	std::string path;
 
-	http::headers_parser headers_parser;
+	http::headers headers;
 
 	/**
 	 * @brief Feed text portion to parse.
