@@ -38,6 +38,12 @@
             "type": "shell",
             "command": "make run-app config=dbg",
             "group": "build"
-        }
+        },
+        {
+            "label": "test-dbg",
+            "type": "shell",
+            "command": "make config=dbg test",
+            "group": "build"
+        },
     ]
 }
