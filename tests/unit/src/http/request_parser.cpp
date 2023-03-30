@@ -73,7 +73,7 @@ tst::set set("http__request_parser", [](tst::suite& suite){
             "GET / HTT",
             "GET / HTTP/1.1",
             "GET / HTTP/1.1\n",
-            "GET / HTTP/1.1" "\n"
+            "GET / HTTP/1.1" "\n" // NOLINT(bugprone-suspicious-missing-comma)
                 "Ho",
             "GET / HTTP/1.1" "\n"
                 "Host:",
