@@ -11,7 +11,11 @@ std::string print_parsed_http_header(const pautina::http_parser& p){
     ss << "path = " << p.path << std::endl;
     ss << "protocol = " << pautina::http::protocol_to_string(p.protocol) << std::endl;
 
-    // TODO:
+    for(const auto& h : p.headers){
+        ss << "name: " << h.first << std::endl;
+        ss << "value: " << h.second << std::endl;
+    }
+    
     return ss.str();
 }
 }
@@ -22,11 +26,29 @@ tst::set set("http_parser", [](tst::suite& suite){
         "samples",
         {
             {
-                "GET / HTTP/1.1\n",
+                "GET / HTTP/1.1" "\n"
+                "\n",
 
                 "method = GET" "\n"
                 "path = /" "\n"
                 "protocol = HTTP/1.1" "\n"
+            },
+            {
+                "GET / HTTP/1.1" "\n"
+                "Host: localhost:8080" "\n"
+                "User-Agent: curl/7.74.0" "\n"
+                "Accept: */*" "\n"
+                "\n",
+
+                "method = GET" "\n"
+                "path = /" "\n"
+                "protocol = HTTP/1.1" "\n"
+                "name: Accept" "\n"
+                "value: */*" "\n"
+                "name: Host" "\n"
+                "value: localhost:8080" "\n"
+                "name: User-Agent" "\n"
+                "value: curl/7.74.0" "\n"
             }
         },
         [](const auto& p){
@@ -34,8 +56,7 @@ tst::set set("http_parser", [](tst::suite& suite){
 
             parser.feed(p.first);
 
-            // TODO: uncomment
-            // tst::check(parser.is_end(), SL);
+            tst::check(parser.is_end(), SL) << "header = \n" << p.first;
 
             auto res = print_parsed_http_header(parser);
 
