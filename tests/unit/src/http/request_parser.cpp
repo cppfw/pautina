@@ -1,7 +1,7 @@
 #include <tst/set.hpp>
 #include <tst/check.hpp>
 
-#include <pautina/http_parser.hpp>
+#include <pautina/http/request_parser.hpp>
 
 namespace{
 std::string print_parsed_http_header(const pautina::http_parser& p){
@@ -21,7 +21,7 @@ std::string print_parsed_http_header(const pautina::http_parser& p){
 }
 
 namespace{
-tst::set set("http_parser", [](tst::suite& suite){
+tst::set set("http__request_parser", [](tst::suite& suite){
     suite.add<std::pair<std::string, std::string>>(
         "samples",
         {

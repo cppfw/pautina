@@ -31,8 +31,8 @@ SOFTWARE.
 #include <string_view>
 #include <vector>
 
-#include "http/headers_parser.hpp"
-#include "http/http.hpp"
+#include "headers_parser.hpp"
+#include "http.hpp"
 
 namespace pautina {
 
