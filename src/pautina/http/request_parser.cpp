@@ -117,6 +117,12 @@ std::string_view request_parser::parse_protocol(std::string_view str)
 	return str;
 }
 
+std::string_view request_parser::parse_body(std::string_view str)
+{
+	// TODO:
+	return str;
+}
+
 std::string_view request_parser::feed(std::string_view str)
 {
 	while (!str.empty()) {
@@ -140,9 +146,15 @@ std::string_view request_parser::feed(std::string_view str)
 				if (this->headers_parser.is_end()) {
 					this->request.headers = std::move(this->headers_parser.headers);
 					this->check_required_headers();
+
+					// TODO: decide if there should be body following headers
 					this->cur_state = state::end;
+
 					return str;
 				}
+				break;
+			case state::body:
+				str = this->parse_body(str);
 				break;
 			case state::end:
 				return str;

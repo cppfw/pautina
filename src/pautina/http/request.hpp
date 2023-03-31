@@ -26,6 +26,8 @@ SOFTWARE.
 
 #pragma once
 
+#include <vector>
+
 #include "headers.hpp"
 #include "http.hpp"
 
@@ -39,6 +41,8 @@ public:
 	std::string path;
 
 	http::headers headers;
+
+	std::vector<uint8_t> body;
 };
 
 } // namespace pautina::http

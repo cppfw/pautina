@@ -44,6 +44,7 @@ class request_parser
 		path,
 		protocol,
 		headers,
+		body,
 		end
 	};
 
@@ -56,6 +57,7 @@ class request_parser
 	std::string_view parse_method(std::string_view str);
 	std::string_view parse_path(std::string_view str);
 	std::string_view parse_protocol(std::string_view str);
+	std::string_view parse_body(std::string_view str);
 
 	std::string header_name; // for storing header name until header value is parsed
 
@@ -73,6 +75,7 @@ public:
 	 *     HTTP header end has been encountered in the middle of the fed data.
 	 * @throw std::invalid_argument in case of malformed HTTP header.
 	 */
+	// TODO: use span<uint8_t>
 	std::string_view feed(std::string_view str);
 
 	/**
