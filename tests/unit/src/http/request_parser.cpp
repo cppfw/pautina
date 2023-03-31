@@ -49,6 +49,30 @@ tst::set set("http__request_parser", [](tst::suite& suite){
                 "value: localhost:8080" "\n"
                 "name: User-Agent" "\n"
                 "value: curl/7.74.0" "\n"
+            },
+            {
+                "POST / HTTP/1.1" "\n"
+                "Host: localhost:8080" "\n"
+                "User-Agent: curl/7.74.0" "\n"
+                "Accept: */*" "\n"
+                "Content-Length: 11" "\n"
+                "Content-Type: application/x-www-form-urlencoded" "\n"
+                "\n"
+                "[post data]",
+
+                "method = POST" "\n"
+                "path = /" "\n"
+                "protocol = HTTP/1.1" "\n"
+                "name: Accept" "\n"
+                "value: */*" "\n"
+                "name: Content-Length" "\n"
+                "value: 11" "\n"
+                "name: Content-Type" "\n"
+                "value: application/x-www-form-urlencoded" "\n"
+                "name: Host" "\n"
+                "value: localhost:8080" "\n"
+                "name: User-Agent" "\n"
+                "value: curl/7.74.0" "\n"
             }
         },
         [](const auto& p){
