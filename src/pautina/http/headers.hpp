@@ -33,6 +33,18 @@ SOFTWARE.
 
 namespace pautina::http {
 
+enum class header {
+	// WARNING: do not change order, add new items to the end of enum
+	host,
+	accept,
+
+	// TODO: add well known headers
+
+	enum_size
+};
+
+std::string_view to_string(header h);
+
 class headers
 {
 	std::map<std::string, std::string, std::less<>> hdrs;

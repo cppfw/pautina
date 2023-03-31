@@ -31,6 +31,7 @@ SOFTWARE.
 namespace pautina::http {
 
 enum class protocol {
+	// order is ascending by protocol version
 	http_1_0,
 	http_1_1,
 	http_2_0

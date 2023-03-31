@@ -26,9 +26,23 @@ SOFTWARE.
 
 #include "headers.hpp"
 
+#include <array>
+
 #include <utki/string.hpp>
 
 using namespace pautina::http;
+
+namespace {
+const constexpr std::array<std::string_view, size_t(header::enum_size)> header_enum_to_string_mapping = {
+	"Host",
+	"Accept"};
+} // namespace
+
+std::string_view pautina::http::to_string(header h)
+{
+	ASSERT(size_t(h) < size_t(header::enum_size))
+	return header_enum_to_string_mapping[size_t(h)];
+}
 
 std::optional<std::string_view> headers::get(std::string_view name) const noexcept
 {

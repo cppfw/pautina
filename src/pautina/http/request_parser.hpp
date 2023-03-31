@@ -36,7 +36,7 @@ SOFTWARE.
 
 namespace pautina {
 
-class http_parser
+class request_parser
 {
 	enum class state {
 		skip_spaces,
@@ -60,6 +60,8 @@ class http_parser
 	std::string header_name; // for storing header name until header value is parsed
 
 	http::headers_parser headers_parser;
+
+	void check_required_headers();
 
 public:
 	http::request request;

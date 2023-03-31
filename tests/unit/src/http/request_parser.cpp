@@ -26,12 +26,12 @@ tst::set set("http__request_parser", [](tst::suite& suite){
         "samples",
         {
             {
-                "GET / HTTP/1.1" "\n"
+                "GET / HTTP/1.0" "\n"
                 "\n",
 
                 "method = GET" "\n"
                 "path = /" "\n"
-                "protocol = HTTP/1.1" "\n"
+                "protocol = HTTP/1.0" "\n"
             },
             {
                 "GET / HTTP/1.1" "\n"
@@ -52,7 +52,7 @@ tst::set set("http__request_parser", [](tst::suite& suite){
             }
         },
         [](const auto& p){
-            pautina::http_parser parser;
+            pautina::request_parser parser;
 
             parser.feed(p.first);
 
@@ -88,7 +88,7 @@ tst::set set("http__request_parser", [](tst::suite& suite){
                 "Accept: */*" "\n",
         },
         [](const auto& p){
-            pautina::http_parser parser;
+            pautina::request_parser parser;
 
             parser.feed(p);
 

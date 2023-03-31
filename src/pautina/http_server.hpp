@@ -54,7 +54,7 @@ public:
 	};
 
 	http_server(configuration config);
-	~http_server()override;
+	~http_server() override;
 
 	void add(std::vector<std::string> path, std::function<void()> handler);
 

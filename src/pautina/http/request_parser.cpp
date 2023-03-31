@@ -34,7 +34,7 @@ SOFTWARE.
 
 using namespace pautina;
 
-std::string_view http_parser::parse_skip_spaces(std::string_view str)
+std::string_view request_parser::parse_skip_spaces(std::string_view str)
 {
 	auto i = str.begin();
 	for (; i != str.end(); ++i) {
@@ -48,7 +48,7 @@ std::string_view http_parser::parse_skip_spaces(std::string_view str)
 	return str;
 }
 
-std::string_view http_parser::parse_method(std::string_view str)
+std::string_view request_parser::parse_method(std::string_view str)
 {
 	auto i = str.begin();
 	for (; i != str.end(); ++i) {
@@ -72,7 +72,7 @@ std::string_view http_parser::parse_method(std::string_view str)
 	return str;
 }
 
-std::string_view http_parser::parse_path(std::string_view str)
+std::string_view request_parser::parse_path(std::string_view str)
 {
 	auto i = str.begin();
 	for (; i != str.end(); ++i) {
@@ -94,7 +94,7 @@ std::string_view http_parser::parse_path(std::string_view str)
 	return str;
 }
 
-std::string_view http_parser::parse_protocol(std::string_view str)
+std::string_view request_parser::parse_protocol(std::string_view str)
 {
 	// std::cout << "parse_protocol(): str = " << str << std::endl;
 	auto i = str.begin();
@@ -117,7 +117,7 @@ std::string_view http_parser::parse_protocol(std::string_view str)
 	return str;
 }
 
-std::string_view http_parser::feed(std::string_view str)
+std::string_view request_parser::feed(std::string_view str)
 {
 	while (!str.empty()) {
 		switch (this->cur_state) {
@@ -139,6 +139,7 @@ std::string_view http_parser::feed(std::string_view str)
 				str = this->headers_parser.feed(str);
 				if (this->headers_parser.is_end()) {
 					this->request.headers = std::move(this->headers_parser.headers);
+					this->check_required_headers();
 					this->cur_state = state::end;
 					return str;
 				}
@@ -148,4 +149,15 @@ std::string_view http_parser::feed(std::string_view str)
 		}
 	}
 	return str;
+}
+
+void request_parser::check_required_headers()
+{
+	if (this->request.protocol >= http::protocol::http_1_1) {
+		if (!this->request.headers.get(http::to_string(http::header::host))) {
+			std::stringstream ss;
+			ss << "HTTP/1.1+ request protocol requires 'Host' header, which is missing";
+			throw std::invalid_argument(ss.str());
+		}
+	}
 }
