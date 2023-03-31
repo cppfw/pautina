@@ -30,6 +30,8 @@ SOFTWARE.
 #include <string_view>
 #include <vector>
 
+#include <utki/span.hpp>
+
 #include "headers.hpp"
 
 namespace pautina::http {
@@ -48,9 +50,9 @@ class headers_parser
 
 	std::vector<char> buf; // for storing currently parsed string
 
-	std::string_view parse_skip_spaces(std::string_view str);
-	std::string_view parse_name(std::string_view str);
-	std::string_view parse_value(std::string_view str);
+	utki::span<const uint8_t> parse_skip_spaces(utki::span<const uint8_t> data);
+	utki::span<const uint8_t> parse_name(utki::span<const uint8_t> data);
+	utki::span<const uint8_t> parse_value(utki::span<const uint8_t> data);
 
 	std::string header_name; // for storing header name until header value is parsed
 
@@ -58,13 +60,13 @@ public:
 	http::headers headers;
 
 	/**
-	 * @brief Feed text portion to parse.
-	 * @param str - portion of text to parse.
-	 * @return std::string_view remained after parsing. It can be non-empty in case
+	 * @brief Feed data portion to parse.
+	 * @param data - portion of data to parse.
+	 * @return span remained after parsing. It can be non-empty in case
 	 *     HTTP headers end has been encountered in the middle of the fed data.
 	 * @throw std::invalid_argument in case of malformed HTTP headers.
 	 */
-	std::string_view feed(std::string_view str);
+	utki::span<const uint8_t> feed(utki::span<const uint8_t> data);
 
 	/**
 	 * @brief Check if end of HTTP headers is reached.

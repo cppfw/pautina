@@ -30,25 +30,25 @@ SOFTWARE.
 
 using namespace pautina::http;
 
-std::string_view headers_parser::parse_skip_spaces(std::string_view str)
+utki::span<const uint8_t> headers_parser::parse_skip_spaces(utki::span<const uint8_t> data)
 {
-	auto i = str.begin();
-	for (; i != str.end(); ++i) {
-		auto c = *i;
+	auto i = data.begin();
+	for (; i != data.end(); ++i) {
+		auto c = char(*i);
 		if (c != ' ') {
 			this->cur_state = this->state_after_skiping_spaces;
 			break;
 		}
 	}
-	str = str.substr(std::distance(str.begin(), i));
-	return str;
+	data = data.subspan(std::distance(data.begin(), i));
+	return data;
 }
 
-std::string_view headers_parser::parse_name(std::string_view str)
+utki::span<const uint8_t> headers_parser::parse_name(utki::span<const uint8_t> data)
 {
-	auto i = str.begin();
-	for (; i != str.end(); ++i) {
-		auto c = *i;
+	auto i = data.begin();
+	for (; i != data.end(); ++i) {
+		auto c = char(*i);
 
 		if (c == ':') {
 			this->header_name = utki::make_string(this->buf);
@@ -66,15 +66,15 @@ std::string_view headers_parser::parse_name(std::string_view str)
 
 		this->buf.push_back(c);
 	}
-	str = str.substr(std::distance(str.begin(), i));
-	return str;
+	data = data.subspan(std::distance(data.begin(), i));
+	return data;
 }
 
-std::string_view headers_parser::parse_value(std::string_view str)
+utki::span<const uint8_t> headers_parser::parse_value(utki::span<const uint8_t> data)
 {
-	auto i = str.begin();
-	for (; i != str.end(); ++i) {
-		auto c = *i;
+	auto i = data.begin();
+	for (; i != data.end(); ++i) {
+		auto c = char(*i);
 
 		if (c == '\n') {
 			this->headers.add(std::move(this->header_name), utki::make_string(this->buf));
@@ -86,26 +86,26 @@ std::string_view headers_parser::parse_value(std::string_view str)
 
 		this->buf.push_back(c);
 	}
-	str = str.substr(std::distance(str.begin(), i));
-	return str;
+	data = data.subspan(std::distance(data.begin(), i));
+	return data;
 }
 
-std::string_view headers_parser::feed(std::string_view str)
+utki::span<const uint8_t> headers_parser::feed(utki::span<const uint8_t> data)
 {
-	while (!str.empty()) {
+	while (!data.empty()) {
 		switch (this->cur_state) {
 			case state::skip_spaces:
-				str = this->parse_skip_spaces(str);
+				data = this->parse_skip_spaces(data);
 				break;
 			case state::name:
-				str = this->parse_name(str);
+				data = this->parse_name(data);
 				break;
 			case state::value:
-				str = this->parse_value(str);
+				data = this->parse_value(data);
 				break;
 			case state::end:
-				return str;
+				return data;
 		}
 	}
-	return str;
+	return data;
 }

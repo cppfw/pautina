@@ -53,11 +53,11 @@ class request_parser
 
 	std::vector<char> buf;
 
-	std::string_view parse_skip_spaces(std::string_view str);
-	std::string_view parse_method(std::string_view str);
-	std::string_view parse_path(std::string_view str);
-	std::string_view parse_protocol(std::string_view str);
-	std::string_view parse_body(std::string_view str);
+	utki::span<const uint8_t> parse_skip_spaces(utki::span<const uint8_t> data);
+	utki::span<const uint8_t> parse_method(utki::span<const uint8_t> data);
+	utki::span<const uint8_t> parse_path(utki::span<const uint8_t> data);
+	utki::span<const uint8_t> parse_protocol(utki::span<const uint8_t> data);
+	utki::span<const uint8_t> parse_body(utki::span<const uint8_t> data);
 
 	std::string header_name; // for storing header name until header value is parsed
 
@@ -69,14 +69,13 @@ public:
 	http::request request;
 
 	/**
-	 * @brief Feed text portion to parse.
-	 * @param str - portion of text to parse.
-	 * @return std::string_view remained after parsing. It can be non-empty in case
+	 * @brief Feed data portion to parse.
+	 * @param data - portion of data to parse.
+	 * @return span remained after parsing. It can be non-empty in case
 	 *     HTTP header end has been encountered in the middle of the fed data.
 	 * @throw std::invalid_argument in case of malformed HTTP header.
 	 */
-	// TODO: use span<uint8_t>
-	std::string_view feed(std::string_view str);
+	utki::span<const uint8_t> feed(utki::span<const uint8_t> data);
 
 	/**
 	 * @brief Check if end of HTTP header is reached.

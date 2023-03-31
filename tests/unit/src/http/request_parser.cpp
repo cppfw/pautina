@@ -54,7 +54,10 @@ tst::set set("http__request_parser", [](tst::suite& suite){
         [](const auto& p){
             pautina::request_parser parser;
 
-            parser.feed(p.first);
+            parser.feed(utki::make_span<const uint8_t>(
+                reinterpret_cast<const uint8_t*>(p.first.data()),
+                p.first.size()
+            ));
 
             tst::check(parser.is_end(), SL) << "header = \n" << p.first;
 
@@ -90,7 +93,12 @@ tst::set set("http__request_parser", [](tst::suite& suite){
         [](const auto& p){
             pautina::request_parser parser;
 
-            parser.feed(p);
+            parser.feed(
+                utki::make_span(
+                    reinterpret_cast<const uint8_t*>(p.data()),
+                    p.size()
+                )
+            );
 
             tst::check(!parser.is_end(), SL);
         }

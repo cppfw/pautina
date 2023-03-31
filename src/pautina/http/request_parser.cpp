@@ -34,25 +34,25 @@ SOFTWARE.
 
 using namespace pautina;
 
-std::string_view request_parser::parse_skip_spaces(std::string_view str)
+utki::span<const uint8_t> request_parser::parse_skip_spaces(utki::span<const uint8_t> data)
 {
-	auto i = str.begin();
-	for (; i != str.end(); ++i) {
-		auto c = *i;
+	auto i = data.begin();
+	for (; i != data.end(); ++i) {
+		auto c = char(*i);
 		if (c != ' ') {
 			this->cur_state = this->state_after_skiping_spaces;
 			break;
 		}
 	}
-	str = str.substr(std::distance(str.begin(), i));
-	return str;
+	data = data.subspan(std::distance(data.begin(), i));
+	return data;
 }
 
-std::string_view request_parser::parse_method(std::string_view str)
+utki::span<const uint8_t> request_parser::parse_method(utki::span<const uint8_t> data)
 {
-	auto i = str.begin();
-	for (; i != str.end(); ++i) {
-		auto c = *i;
+	auto i = data.begin();
+	for (; i != data.end(); ++i) {
+		auto c = char(*i);
 
 		if (c == ' ') {
 			// method name read
@@ -68,15 +68,15 @@ std::string_view request_parser::parse_method(std::string_view str)
 
 		this->buf.push_back(std::toupper(c, std::locale::classic()));
 	}
-	str = str.substr(std::distance(str.begin(), i));
-	return str;
+	data = data.subspan(std::distance(data.begin(), i));
+	return data;
 }
 
-std::string_view request_parser::parse_path(std::string_view str)
+utki::span<const uint8_t> request_parser::parse_path(utki::span<const uint8_t> data)
 {
-	auto i = str.begin();
-	for (; i != str.end(); ++i) {
-		auto c = *i;
+	auto i = data.begin();
+	for (; i != data.end(); ++i) {
+		auto c = char(*i);
 
 		if (c == ' ') {
 			this->request.path = utki::make_string(this->buf);
@@ -89,17 +89,17 @@ std::string_view request_parser::parse_path(std::string_view str)
 
 		this->buf.push_back(c);
 	}
-	str = str.substr(std::distance(str.begin(), i));
-	// std::cout << "parse_path(): str = " << str << std::endl;
-	return str;
+	data = data.subspan(std::distance(data.begin(), i));
+	// std::cout << "parse_path(): data = " << data << std::endl;
+	return data;
 }
 
-std::string_view request_parser::parse_protocol(std::string_view str)
+utki::span<const uint8_t> request_parser::parse_protocol(utki::span<const uint8_t> data)
 {
-	// std::cout << "parse_protocol(): str = " << str << std::endl;
-	auto i = str.begin();
-	for (; i != str.end(); ++i) {
-		auto c = *i;
+	// std::cout << "parse_protocol(): data = " << data << std::endl;
+	auto i = data.begin();
+	for (; i != data.end(); ++i) {
+		auto c = char(*i);
 
 		if (c == '\n') {
 			this->request.protocol = http::protocol_from_string(utki::make_string_view(this->buf));
@@ -113,36 +113,36 @@ std::string_view request_parser::parse_protocol(std::string_view str)
 
 		this->buf.push_back(c);
 	}
-	str = str.substr(std::distance(str.begin(), i));
-	return str;
+	data = data.subspan(std::distance(data.begin(), i));
+	return data;
 }
 
-std::string_view request_parser::parse_body(std::string_view str)
+utki::span<const uint8_t> request_parser::parse_body(utki::span<const uint8_t> data)
 {
 	// TODO:
-	return str;
+	return data;
 }
 
-std::string_view request_parser::feed(std::string_view str)
+utki::span<const uint8_t> request_parser::feed(utki::span<const uint8_t> data)
 {
-	while (!str.empty()) {
+	while (!data.empty()) {
 		switch (this->cur_state) {
 			case state::skip_spaces:
-				str = this->parse_skip_spaces(str);
+				data = this->parse_skip_spaces(data);
 				break;
 			case state::method:
-				str = this->parse_method(str);
+				data = this->parse_method(data);
 				break;
 			case state::path:
-				str = this->parse_path(str);
-				// std::cout << "feed(): str = " << str << std::endl;
+				data = this->parse_path(data);
+				// std::cout << "feed(): data = " << data << std::endl;
 				break;
 			case state::protocol:
-				// std::cout << "feed(): str = " << str << std::endl;
-				str = this->parse_protocol(str);
+				// std::cout << "feed(): data = " << data << std::endl;
+				data = this->parse_protocol(data);
 				break;
 			case state::headers:
-				str = this->headers_parser.feed(str);
+				data = this->headers_parser.feed(data);
 				if (this->headers_parser.is_end()) {
 					this->request.headers = std::move(this->headers_parser.headers);
 					this->check_required_headers();
@@ -150,17 +150,17 @@ std::string_view request_parser::feed(std::string_view str)
 					// TODO: decide if there should be body following headers
 					this->cur_state = state::end;
 
-					return str;
+					return data;
 				}
 				break;
 			case state::body:
-				str = this->parse_body(str);
+				data = this->parse_body(data);
 				break;
 			case state::end:
-				return str;
+				return data;
 		}
 	}
-	return str;
+	return data;
 }
 
 void request_parser::check_required_headers()
