@@ -124,7 +124,6 @@ utki::span<const uint8_t> request_parser::parse_body(utki::span<const uint8_t> d
 	this->num_body_bytes_expected -= num_bytes_to_read;
 	if (this->num_body_bytes_expected == 0) {
 		this->cur_state = state::end;
-		return nullptr; // return empty span
 	}
 	return data.subspan(num_bytes_to_read);
 }
