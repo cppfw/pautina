@@ -148,6 +148,7 @@ void request_parser::set_state_after_headers()
 	ASSERT(content_length_header.has_value())
 	utki::string_parser p(content_length_header.value());
 	this->num_body_bytes_expected = p.read_number<size_t>();
+	this->request.body.reserve(this->num_body_bytes_expected);
 	this->cur_state = state::body;
 }
 
