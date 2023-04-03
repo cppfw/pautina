@@ -37,6 +37,7 @@ enum class header {
 	// WARNING: do not change order, add new items to the end of enum
 	host,
 	accept,
+	content_length,
 
 	// TODO: add well known headers
 

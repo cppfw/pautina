@@ -61,6 +61,7 @@ utki::span<const uint8_t> headers_parser::parse_name(utki::span<const uint8_t> d
 		} else if (c == '\n' && this->buf.empty()) {
 			// end of HTTP request header
 			this->cur_state = state::end;
+			++i;
 			break;
 		}
 

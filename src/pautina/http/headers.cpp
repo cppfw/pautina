@@ -35,7 +35,8 @@ using namespace pautina::http;
 namespace {
 const constexpr std::array<std::string_view, size_t(header::enum_size)> header_enum_to_string_mapping = {
 	"Host",
-	"Accept"};
+	"Accept",
+	"Content-Length"};
 } // namespace
 
 std::string_view pautina::http::to_string(header h)

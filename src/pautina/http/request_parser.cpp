@@ -119,8 +119,37 @@ utki::span<const uint8_t> request_parser::parse_protocol(utki::span<const uint8_
 
 utki::span<const uint8_t> request_parser::parse_body(utki::span<const uint8_t> data)
 {
-	// TODO:
-	return data;
+	auto num_bytes_to_read = data.size() <= this->num_body_bytes_expected ? data.size() : this->num_body_bytes_expected;
+	std::copy(data.begin(), std::next(data.begin(), num_bytes_to_read), std::back_inserter(this->request.body));
+	this->num_body_bytes_expected -= num_bytes_to_read;
+	if (this->num_body_bytes_expected == 0) {
+		this->cur_state = state::end;
+		return nullptr; // return empty span
+	}
+	return data.subspan(num_bytes_to_read);
+}
+
+void request_parser::set_state_after_headers()
+{
+	// According to spec, server SHOULD read and forward message body on any request,
+	// even if the message body is not assumed by the request method.
+	// See section 4.3 of https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html
+
+	auto content_length_header = this->request.headers.get(http::to_string(http::header::content_length));
+	if (!content_length_header.has_value()) {
+		// TODO: implement support of "Transfer-Encoding" header and
+		//   "multipart/byteranges" mediatype.
+		//   See section 4.4 of https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html
+
+		// no body assumed
+		this->cur_state = state::end;
+		return;
+	}
+
+	ASSERT(content_length_header.has_value())
+	utki::string_parser p(content_length_header.value());
+	this->num_body_bytes_expected = p.read_number<size_t>();
+	this->cur_state = state::body;
 }
 
 utki::span<const uint8_t> request_parser::feed(utki::span<const uint8_t> data)
@@ -146,11 +175,9 @@ utki::span<const uint8_t> request_parser::feed(utki::span<const uint8_t> data)
 				if (this->headers_parser.is_end()) {
 					this->request.headers = std::move(this->headers_parser.headers);
 					this->check_required_headers();
-
-					// TODO: decide if there should be body following headers
-					this->cur_state = state::end;
-
-					return data;
+					this->set_state_after_headers();
+				} else {
+					ASSERT(data.empty())
 				}
 				break;
 			case state::body:

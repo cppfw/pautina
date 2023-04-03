@@ -83,7 +83,7 @@ tst::set set("http__request_parser", [](tst::suite& suite){
                 p.first.size()
             ));
 
-            tst::check(parser.is_end(), SL) << "header = \n" << p.first;
+            tst::check(parser.is_end(), SL) << "request = \n" << p.first;
 
             auto res = print_parsed_http_request(parser.request);
 
