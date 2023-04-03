@@ -28,21 +28,9 @@ SOFTWARE.
 
 #include <utki/string.hpp>
 
-using namespace pautina::http;
+#include "util.hxx"
 
-utki::span<const uint8_t> headers_parser::parse_skip_spaces(utki::span<const uint8_t> data)
-{
-	auto i = data.begin();
-	for (; i != data.end(); ++i) {
-		auto c = char(*i);
-		if (c != ' ') {
-			this->cur_state = this->state_after_skiping_spaces;
-			break;
-		}
-	}
-	data = data.subspan(std::distance(data.begin(), i));
-	return data;
-}
+using namespace pautina::http;
 
 utki::span<const uint8_t> headers_parser::parse_name(utki::span<const uint8_t> data)
 {
@@ -96,7 +84,12 @@ utki::span<const uint8_t> headers_parser::feed(utki::span<const uint8_t> data)
 	while (!data.empty()) {
 		switch (this->cur_state) {
 			case state::skip_spaces:
-				data = this->parse_skip_spaces(data);
+				ASSERT(!data.empty())
+				data = parse_skip_spaces(data);
+				if (!data.empty()) {
+					// spaces skipped
+					this->cur_state = this->state_after_skiping_spaces;
+				}
 				break;
 			case state::name:
 				data = this->parse_name(data);

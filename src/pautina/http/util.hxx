@@ -26,56 +26,16 @@ SOFTWARE.
 
 #pragma once
 
-#include <string>
-#include <string_view>
-#include <vector>
-
 #include <utki/span.hpp>
-
-#include "headers.hpp"
 
 namespace pautina::http {
 
-class headers_parser
-{
-	enum class state {
-		skip_spaces,
-		name,
-		value,
-		end
-	};
-
-	state cur_state = state::name;
-	state state_after_skiping_spaces;
-
-	std::vector<char> buf; // for storing currently parsed string
-
-	utki::span<const uint8_t> parse_name(utki::span<const uint8_t> data);
-	utki::span<const uint8_t> parse_value(utki::span<const uint8_t> data);
-
-	std::string header_name; // for storing header name until header value is parsed
-
-public:
-	http::headers headers;
-
-	/**
-	 * @brief Feed data portion to parse.
-	 * @param data - portion of data to parse.
-	 * @return span remained after parsing. It can be non-empty in case
-	 *     HTTP headers end has been encountered in the middle of the fed data.
-	 * @throw std::invalid_argument in case of malformed HTTP headers.
-	 */
-	utki::span<const uint8_t> feed(utki::span<const uint8_t> data);
-
-	/**
-	 * @brief Check if end of HTTP headers is reached.
-	 * @return true if end of HTTP headers is reached.
-	 * @return false otherwise.
-	 */
-	bool is_end() const noexcept
-	{
-		return this->cur_state == state::end;
-	}
-};
+/**
+ * @brief Skip spaces.
+ * @param data - data span to skip leading spaces for.
+ * @return Data span without leading spaces. If empty span is returned, then
+ *   the original span contained only spaces or was empty in the beginnig place.
+ */
+utki::span<const uint8_t> parse_skip_spaces(utki::span<const uint8_t> data);
 
 } // namespace pautina::http

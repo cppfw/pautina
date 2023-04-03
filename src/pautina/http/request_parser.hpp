@@ -34,7 +34,7 @@ SOFTWARE.
 #include "headers_parser.hpp"
 #include "request.hpp"
 
-namespace pautina {
+namespace pautina::http {
 
 class request_parser
 {
@@ -53,7 +53,6 @@ class request_parser
 
 	std::vector<char> buf;
 
-	utki::span<const uint8_t> parse_skip_spaces(utki::span<const uint8_t> data);
 	utki::span<const uint8_t> parse_method(utki::span<const uint8_t> data);
 	utki::span<const uint8_t> parse_path(utki::span<const uint8_t> data);
 	utki::span<const uint8_t> parse_protocol(utki::span<const uint8_t> data);
@@ -92,4 +91,4 @@ public:
 	}
 };
 
-} // namespace pautina
+} // namespace pautina::http

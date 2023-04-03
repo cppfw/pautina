@@ -76,7 +76,7 @@ tst::set set("http__request_parser", [](tst::suite& suite){
             }
         },
         [](const auto& p){
-            pautina::request_parser parser;
+            pautina::http::request_parser parser;
 
             parser.feed(utki::make_span<const uint8_t>(
                 reinterpret_cast<const uint8_t*>(p.first.data()),
@@ -115,7 +115,7 @@ tst::set set("http__request_parser", [](tst::suite& suite){
                 "Accept: */*" "\n",
         },
         [](const auto& p){
-            pautina::request_parser parser;
+            pautina::http::request_parser parser;
 
             parser.feed(
                 utki::make_span(

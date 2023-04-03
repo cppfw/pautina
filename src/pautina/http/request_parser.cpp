@@ -32,21 +32,9 @@ SOFTWARE.
 
 #include <utki/string.hpp>
 
-using namespace pautina;
+#include "util.hxx"
 
-utki::span<const uint8_t> request_parser::parse_skip_spaces(utki::span<const uint8_t> data)
-{
-	auto i = data.begin();
-	for (; i != data.end(); ++i) {
-		auto c = char(*i);
-		if (c != ' ') {
-			this->cur_state = this->state_after_skiping_spaces;
-			break;
-		}
-	}
-	data = data.subspan(std::distance(data.begin(), i));
-	return data;
-}
+using namespace pautina::http;
 
 utki::span<const uint8_t> request_parser::parse_method(utki::span<const uint8_t> data)
 {
@@ -152,12 +140,28 @@ void request_parser::set_state_after_headers()
 	this->cur_state = state::body;
 }
 
+void request_parser::check_required_headers()
+{
+	if (this->request.protocol >= http::protocol::http_1_1) {
+		if (!this->request.headers.get(http::to_string(http::header::host))) {
+			std::stringstream ss;
+			ss << "HTTP/1.1+ request protocol requires 'Host' header, which is missing";
+			throw std::invalid_argument(ss.str());
+		}
+	}
+}
+
 utki::span<const uint8_t> request_parser::feed(utki::span<const uint8_t> data)
 {
 	while (!data.empty()) {
 		switch (this->cur_state) {
 			case state::skip_spaces:
-				data = this->parse_skip_spaces(data);
+				ASSERT(!data.empty())
+				data = parse_skip_spaces(data);
+				if (!data.empty()) {
+					// spaces skipped
+					this->cur_state = this->state_after_skiping_spaces;
+				}
 				break;
 			case state::method:
 				data = this->parse_method(data);
@@ -188,15 +192,4 @@ utki::span<const uint8_t> request_parser::feed(utki::span<const uint8_t> data)
 		}
 	}
 	return data;
-}
-
-void request_parser::check_required_headers()
-{
-	if (this->request.protocol >= http::protocol::http_1_1) {
-		if (!this->request.headers.get(http::to_string(http::header::host))) {
-			std::stringstream ss;
-			ss << "HTTP/1.1+ request protocol requires 'Host' header, which is missing";
-			throw std::invalid_argument(ss.str());
-		}
-	}
 }
