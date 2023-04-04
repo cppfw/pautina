@@ -5,11 +5,36 @@
     "version": "0.2.0",
     "configurations": [
         {
-			"name": "(gdb) test",
+			"name": "(gdb) httpmodel::request_parser",
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/tests/unit/out/dbg/tests",
-			"args": ["--suite=http__request_parser", "--test=samples[2]"],
+			"args": ["--suite=httpmodel__request_parser", "--test=samples[2]"],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}/tests/unit",
+			"environment": [
+				{
+					"name": "LD_LIBRARY_PATH",
+					"value": "../../src/out/dbg"
+				}
+			],
+			"externalConsole": false,
+			"MIMode": "gdb",
+			"setupCommands": [
+				{
+					"description": "Enable pretty-printing for gdb",
+					"text": "-enable-pretty-printing",
+					"ignoreFailures": true
+				}
+			],
+			"preLaunchTask": "build-dbg"
+		},
+		{
+			"name": "(gdb) urlmodel::parser",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/tests/unit/out/dbg/tests",
+			"args": ["--suite=urlmodel__parser", "--test=samples[0]"],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/tests/unit",
 			"environment": [

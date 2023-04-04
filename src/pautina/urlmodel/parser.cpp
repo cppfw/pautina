@@ -47,7 +47,7 @@ utki::span<const uint8_t> parser::parse_scheme(utki::span<const uint8_t> data)
 			// end of scheme
 			this->url.scheme = utki::make_string(this->buf);
 			this->buf.clear();
-			this->cur_state = state::authority;
+			this->cur_state = state::authority_prefix;
 			++i;
 			break;
 		}

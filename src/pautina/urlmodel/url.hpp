@@ -46,6 +46,10 @@ public:
 	std::vector<std::string> path;
 	std::map<std::string, std::string> query;
 	std::string fragment;
+
+	bool operator==(const urlmodel::url& url) const noexcept;
+
+	std::string to_string() const;
 };
 
 } // namespace pautina::urlmodel

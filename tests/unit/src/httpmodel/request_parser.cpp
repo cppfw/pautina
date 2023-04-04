@@ -21,7 +21,7 @@ std::string print_parsed_http_request(const pautina::http::request& r){
 }
 
 namespace{
-tst::set set("http__request_parser", [](tst::suite& suite){
+tst::set set("httpmodel__request_parser", [](tst::suite& suite){
     suite.add<std::pair<std::string, std::string>>(
         "samples",
         {

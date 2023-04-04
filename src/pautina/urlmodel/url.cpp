@@ -25,3 +25,64 @@ SOFTWARE.
 /* ================ LICENSE END ================ */
 
 #include "url.hpp"
+
+#include <sstream>
+
+using namespace pautina::urlmodel;
+
+bool url::operator==(const urlmodel::url& url) const noexcept
+{
+	return this->scheme == url.scheme && this->username == url.username && this->password == url.password
+		&& this->host == url.host && this->port == url.port && this->path == url.path && this->query == url.query
+		&& this->fragment == url.fragment;
+}
+
+std::string url::to_string() const
+{
+	std::stringstream ss;
+	ss << this->scheme << ':';
+	if (!this->host.empty()) {
+		ss << "//";
+		if (!this->username.empty()) {
+			ss << this->username;
+
+			if (!this->password.empty()) {
+				ss << ':' << this->password;
+			}
+
+			ss << '@';
+		}
+
+		ss << this->host;
+
+		if (this->port != 0) {
+			ss << ':' << this->port;
+		}
+	}
+
+	if (!this->path.empty()) {
+		for (const auto& p : this->path) {
+			ss << '/' << p;
+		}
+	}
+
+	if (!this->query.empty()) {
+		bool is_first = true;
+		for (const auto& q : this->query) {
+			if (is_first) {
+				is_first = false;
+				ss << '?';
+			} else {
+				ss << '&';
+			}
+
+			ss << q.first << '=' << q.second;
+		}
+	}
+
+	if (!this->fragment.empty()) {
+		ss << '#' << this->fragment;
+	}
+
+	return ss.str();
+}
