@@ -56,7 +56,7 @@ class headers_parser
 	std::string header_name; // for storing header name until header value is parsed
 
 public:
-	http::headers headers;
+	httpmodel::headers headers;
 
 	/**
 	 * @brief Feed data portion to parse.

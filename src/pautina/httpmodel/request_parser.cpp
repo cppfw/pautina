@@ -44,7 +44,7 @@ utki::span<const uint8_t> request_parser::parse_method(utki::span<const uint8_t>
 
 		if (c == ' ') {
 			// method name read
-			this->request.method = http::method_from_string(utki::make_string_view(this->buf));
+			this->request.method = httpmodel::method_from_string(utki::make_string_view(this->buf));
 
 			this->buf.clear();
 
@@ -90,7 +90,7 @@ utki::span<const uint8_t> request_parser::parse_protocol(utki::span<const uint8_
 		auto c = char(*i);
 
 		if (c == '\n') {
-			this->request.protocol = http::protocol_from_string(utki::make_string_view(this->buf));
+			this->request.protocol = httpmodel::protocol_from_string(utki::make_string_view(this->buf));
 
 			this->buf.clear();
 
@@ -122,7 +122,7 @@ void request_parser::set_state_after_headers()
 	// even if the message body is not assumed by the request method.
 	// See section 4.3 of https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html
 
-	auto content_length_header = this->request.headers.get(http::to_string(http::header::content_length));
+	auto content_length_header = this->request.headers.get(httpmodel::to_string(httpmodel::header::content_length));
 	if (!content_length_header.has_value()) {
 		// TODO: implement support of "Transfer-Encoding" header and
 		//   "multipart/byteranges" mediatype.
@@ -142,8 +142,8 @@ void request_parser::set_state_after_headers()
 
 void request_parser::check_required_headers()
 {
-	if (this->request.protocol >= http::protocol::http_1_1) {
-		if (!this->request.headers.get(http::to_string(http::header::host))) {
+	if (this->request.protocol >= httpmodel::protocol::http_1_1) {
+		if (!this->request.headers.get(httpmodel::to_string(httpmodel::header::host))) {
 			std::stringstream ss;
 			ss << "HTTP/1.1+ request protocol requires 'Host' header, which is missing";
 			throw std::invalid_argument(ss.str());

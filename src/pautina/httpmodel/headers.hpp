@@ -26,23 +26,39 @@ SOFTWARE.
 
 #pragma once
 
-#include <vector>
+#include <map>
+#include <optional>
+#include <string>
+#include <string_view>
 
-#include "headers.hpp"
-#include "http.hpp"
+namespace pautina::httpmodel {
 
-namespace pautina::http {
+enum class header {
+	// WARNING: do not change order, add new items to the end of enum
+	host,
+	accept,
+	content_length,
 
-class request
-{
-public:
-	http::protocol protocol;
-	http::method method;
-	std::string path;
+	// TODO: add well known headers
 
-	http::headers headers;
-
-	std::vector<uint8_t> body;
+	enum_size
 };
 
-} // namespace pautina::http
+std::string_view to_string(header h);
+
+class headers
+{
+	std::map<std::string, std::string, std::less<>> hdrs;
+
+public:
+	void add(std::string&& name, std::string&& value);
+
+	std::optional<std::string_view> get(std::string_view name) const noexcept;
+
+	const decltype(hdrs)& get_map() const noexcept
+	{
+		return this->hdrs;
+	}
+};
+
+} // namespace pautina::httpmodel

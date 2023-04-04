@@ -28,7 +28,7 @@ SOFTWARE.
 
 #include <string_view>
 
-namespace pautina::http {
+namespace pautina::httpmodel {
 
 enum class protocol {
 	// order is ascending by protocol version
@@ -82,4 +82,4 @@ method method_from_string(std::string_view str);
  */
 std::string_view method_to_string(method m) noexcept;
 
-} // namespace pautina::http
+} // namespace pautina::httpmodel

@@ -1,15 +1,15 @@
 #include <tst/set.hpp>
 #include <tst/check.hpp>
 
-#include <pautina/http/request_parser.hpp>
+#include <pautina/httpmodel/request_parser.hpp>
 
 namespace{
 std::string print_parsed_http_request(const pautina::http::request& r){
     std::stringstream ss;
 
-    ss << "method = " << pautina::http::method_to_string(r.method) << std::endl;
+    ss << "method = " << pautina::httpmodel::method_to_string(r.method) << std::endl;
     ss << "path = " << r.path << std::endl;
-    ss << "protocol = " << pautina::http::protocol_to_string(r.protocol) << std::endl;
+    ss << "protocol = " << pautina::httpmodel::protocol_to_string(r.protocol) << std::endl;
 
     for(const auto& h : r.headers.get_map()){
         ss << "name: " << h.first << std::endl;

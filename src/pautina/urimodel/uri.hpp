@@ -27,38 +27,20 @@ SOFTWARE.
 #pragma once
 
 #include <map>
-#include <optional>
 #include <string>
-#include <string_view>
+#include <vector>
 
-namespace pautina::http {
+namespace pautina::urimodel {
 
-enum class header {
-	// WARNING: do not change order, add new items to the end of enum
-	host,
-	accept,
-	content_length,
-
-	// TODO: add well known headers
-
-	enum_size
-};
-
-std::string_view to_string(header h);
-
-class headers
+class uri
 {
-	std::map<std::string, std::string, std::less<>> hdrs;
-
 public:
-	void add(std::string&& name, std::string&& value);
+	std::string scheme;
+	std::string authority;
 
-	std::optional<std::string_view> get(std::string_view name) const noexcept;
-
-	const decltype(hdrs)& get_map() const noexcept
-	{
-		return this->hdrs;
-	}
+	std::vector<std::string> path;
+	std::map<std::string, std::string> query;
+	std::string fragment;
 };
 
-} // namespace pautina::http
+} // namespace pautina::urimodel
