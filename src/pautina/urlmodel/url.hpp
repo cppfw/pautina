@@ -36,7 +36,12 @@ class uri
 {
 public:
 	std::string scheme;
-	std::string authority;
+
+	std::string username;
+	std::string password;
+
+	std::string host;
+	uint16_t port = 0;
 
 	std::vector<std::string> path;
 	std::map<std::string, std::string> query;

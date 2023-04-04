@@ -37,6 +37,7 @@ class parser
 	enum class state {
 		scheme,
 		authority,
+		path,
 		query_name,
 		query_value,
 		fragment,
@@ -48,6 +49,7 @@ class parser
 	std::vector<uint8_t> buf;
 
 	utki::span<const uint8_t> parse_scheme(utki::span<const uint8_t> data);
+	utki::span<const uint8_t> parse_authority(utki::span<const uint8_t> data);
 
 public:
 	urlmodel::uri uri;

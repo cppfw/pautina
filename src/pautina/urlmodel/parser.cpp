@@ -36,9 +36,12 @@ utki::span<const uint8_t> parser::parse_scheme(utki::span<const uint8_t> data)
 	for (; i != data.end(); ++i) {
 		auto c = char(*i);
 
-		if (c == '/') { // TODO: chck pedantic mode
+		c = std::tolower(c, std::locale::classic());
+
+		if (c == '/') {
 			// start with path without scheme and authority
-			// TODO:
+			this->cur_state = state::path;
+			++i;
 			break;
 		} else if (c == ':') {
 			// end of scheme
@@ -49,10 +52,32 @@ utki::span<const uint8_t> parser::parse_scheme(utki::span<const uint8_t> data)
 			break;
 		}
 
+		if (this->buf.empty()) {
+			if (!std::isalpha(c, std::locale::classic())) {
+				std::stringstream ss;
+				ss << "urlmodel: first char of URL scheme is not alphabethic: " << c;
+				throw std::invalid_argument(ss.str());
+			}
+		} else {
+			if (!(std::isalpha(c, std::locale::classic()) || std::isdigit(c, std::locale::classic()) || c == '+'
+				  || c == '-' || c == '.'))
+			{
+				std::stringstream ss;
+				ss << "urlmodel: URL scheme contains forbidden character: " << c;
+				throw std::invalid_argument(ss.str());
+			}
+		}
+
 		this->buf.push_back(c);
 	}
 	data = data.subspan(std::distance(data.begin(), i));
 	return data;
+}
+
+utki::span<const uint8_t> parser::parse_authority(utki::span<const uint8_t> data)
+{
+	// TODO:
+	return nullptr;
 }
 
 utki::span<const uint8_t> parser::feed(utki::span<const uint8_t> data)
@@ -61,6 +86,9 @@ utki::span<const uint8_t> parser::feed(utki::span<const uint8_t> data)
 		switch (this->cur_state) {
 			case state::scheme:
 				data = this->parse_scheme(data);
+				break;
+			case state::authority:
+				data = this->parse_authority(data);
 				break;
 			case state::end:
 				return data;
