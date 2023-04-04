@@ -36,6 +36,7 @@ class parser
 {
 	enum class state {
 		scheme,
+		authority_prefix,
 		authority,
 		path,
 		query_name,
@@ -49,10 +50,14 @@ class parser
 	std::vector<uint8_t> buf;
 
 	utki::span<const uint8_t> parse_scheme(utki::span<const uint8_t> data);
+	utki::span<const uint8_t> parse_authority_prefix(utki::span<const uint8_t> data);
 	utki::span<const uint8_t> parse_authority(utki::span<const uint8_t> data);
+	utki::span<const uint8_t> parse_path(utki::span<const uint8_t> data);
+
+	void handle_end_of_authority();
 
 public:
-	urlmodel::uri uri;
+	urlmodel::url url;
 
 	/**
 	 * @brief Feed data portion to parse.

@@ -32,7 +32,7 @@ SOFTWARE.
 
 namespace pautina::urlmodel {
 
-class uri
+class url
 {
 public:
 	std::string scheme;
