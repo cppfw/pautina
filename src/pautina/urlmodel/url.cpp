@@ -24,23 +24,4 @@ SOFTWARE.
 
 /* ================ LICENSE END ================ */
 
-#pragma once
-
-#include <map>
-#include <string>
-#include <vector>
-
-namespace pautina::urimodel {
-
-class uri
-{
-public:
-	std::string scheme;
-	std::string authority;
-
-	std::vector<std::string> path;
-	std::map<std::string, std::string> query;
-	std::string fragment;
-};
-
-} // namespace pautina::urimodel
+#include "url.hpp"

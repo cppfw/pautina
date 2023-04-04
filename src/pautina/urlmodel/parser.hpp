@@ -28,9 +28,9 @@ SOFTWARE.
 
 #include <utki/span.hpp>
 
-#include "uri.hpp"
+#include "url.hpp"
 
-namespace pautina::urimodel {
+namespace pautina::urlmodel {
 
 class parser
 {
@@ -50,7 +50,7 @@ class parser
 	utki::span<const uint8_t> parse_scheme(utki::span<const uint8_t> data);
 
 public:
-	urimodel::uri uri;
+	urlmodel::uri uri;
 
 	/**
 	 * @brief Feed data portion to parse.
@@ -78,4 +78,4 @@ public:
 	}
 };
 
-} // namespace pautina::urimodel
+} // namespace pautina::urlmodel
