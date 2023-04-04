@@ -26,4 +26,47 @@ SOFTWARE.
 
 #include "parser.hpp"
 
+#include <utki/string.hpp>
+
 using namespace pautina::urimodel;
+
+utki::span<const uint8_t> parser::parse_scheme(utki::span<const uint8_t> data)
+{
+	auto i = data.begin();
+	for (; i != data.end(); ++i) {
+		auto c = char(*i);
+
+		if (c == '/') { // TODO: chck pedantic mode
+			// start with path without scheme and authority
+			// TODO:
+			break;
+		} else if (c == ':') {
+			// end of scheme
+			this->uri.scheme = utki::make_string(this->buf);
+			this->buf.clear();
+			this->cur_state = state::authority;
+			++i;
+			break;
+		}
+
+		this->buf.push_back(c);
+	}
+	data = data.subspan(std::distance(data.begin(), i));
+	return data;
+}
+
+utki::span<const uint8_t> parser::feed(utki::span<const uint8_t> data)
+{
+	while (!data.empty()) {
+		switch (this->cur_state) {
+			case state::scheme:
+				data = this->parse_scheme(data);
+				break;
+			case state::end:
+				return data;
+			default: // TODO: remove default case
+				break;
+		}
+	}
+	return data;
+}

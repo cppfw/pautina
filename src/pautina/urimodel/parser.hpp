@@ -26,16 +26,56 @@ SOFTWARE.
 
 #pragma once
 
+#include <utki/span.hpp>
+
 #include "uri.hpp"
 
 namespace pautina::urimodel {
 
 class parser
 {
+	enum class state {
+		scheme,
+		authority,
+		query_name,
+		query_value,
+		fragment,
+		end
+	};
+
+	state cur_state = state::scheme;
+
+	std::vector<uint8_t> buf;
+
+	utki::span<const uint8_t> parse_scheme(utki::span<const uint8_t> data);
+
 public:
 	urimodel::uri uri;
 
-	
+	/**
+	 * @brief Feed data portion to parse.
+	 * @param data - portion of data to parse.
+	 * @return span remained after parsing. It can be non-empty in case
+	 *     URI end has been encountered in the middle of the fed data.
+	 * @throw std::invalid_argument in case of malformed HTTP header.
+	 */
+	utki::span<const uint8_t> feed(utki::span<const uint8_t> data);
+
+	/**
+	 * @brief End of input data reached.
+	 * This function tells parser that end of input data has been reached.
+	 */
+	void end_of_data();
+
+	/**
+	 * @brief Check if end of HTTP header is reached.
+	 * @return true if end of HTTP header is reached.
+	 * @return false otherwise.
+	 */
+	bool is_end() const noexcept
+	{
+		return this->cur_state == state::end;
+	}
 };
 
 } // namespace pautina::urimodel
