@@ -254,7 +254,7 @@ utki::span<const uint8_t> parser::parse_query_name(utki::span<const uint8_t> dat
 		auto c = char(*i);
 
 		if (std::isspace(c, std::locale::classic())) {
-			throw std::invalid_argument("urlmodel: unexpected whitespace while parsing query parameter name");
+			throw std::invalid_argument("urlmodel: unexpected end of URL while parsing query parameter name");
 		} else if (c == '=') {
 			this->parsed_query_name = utki::make_string(this->buf);
 			this->buf.clear();

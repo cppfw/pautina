@@ -203,6 +203,68 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
                 }
             },
             {
+                "/",
+                pautina::urlmodel::url{}
+            },
+            {
+                "/path/to/dir",
+                pautina::urlmodel::url{
+                    .path = {"path", "to", "dir"},
+                }
+            },
+            {
+                "/path/to/dir?param1=value1",
+                pautina::urlmodel::url{
+                    .path = {"path", "to", "dir"},
+                    .query = {
+                        {"param1", "value1"}
+                    }
+                }
+            },
+            {
+                "/path/to/dir?param1=value1&param2=value2",
+                pautina::urlmodel::url{
+                    .path = {"path", "to", "dir"},
+                    .query = {
+                        {"param1", "value1"},
+                        {"param2", "value2"}
+                    }
+                }
+            },
+            {
+                "/?param1=value1&param2=value2",
+                pautina::urlmodel::url{
+                    .query = {
+                        {"param1", "value1"},
+                        {"param2", "value2"}
+                    }
+                }
+            },
+            {
+                "/#fragment",
+                pautina::urlmodel::url{
+                    .fragment = "fragment"
+                }
+            },
+            {
+                "/path/to/dir#fragment",
+                pautina::urlmodel::url{
+                    .path = {"path", "to", "dir"},
+                    .fragment = "fragment"
+                }
+            },
+            {
+                "/path/to/dir?param1=value1&param2=value2#fragment",
+                pautina::urlmodel::url{
+                    .path = {"path", "to", "dir"},
+                    .query = {
+                        {"param1", "value1"},
+                        {"param2", "value2"}
+                    },
+                    .fragment = "fragment"
+                }
+            },
+            {
                 "http://user:password@host.com:8080/path/to/dir?param1=value1&param2=value2#fragment",
                 pautina::urlmodel::url{
                     .scheme = "http",
