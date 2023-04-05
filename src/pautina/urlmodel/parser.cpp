@@ -39,7 +39,7 @@ utki::span<const uint8_t> parser::parse_scheme(utki::span<const uint8_t> data)
 		c = std::tolower(c, std::locale::classic());
 
 		if (c == '/') {
-			// start with path without scheme and authority
+			// start parsing path without scheme and authority
 			this->cur_state = state::path;
 			++i;
 			break;
@@ -81,7 +81,11 @@ utki::span<const uint8_t> parser::parse_authority_prefix(utki::span<const uint8_
 		auto c = char(*i);
 
 		if (c != '/') {
-			if (c == '?') {
+			if (std::isspace(c, std::locale::classic())) {
+				ASSERT(this->buf.empty() || (this->buf.size() == 1 && this->buf[0] == '/'))
+				this->cur_state = state::end;
+				break;
+			} else if (c == '?') {
 				ASSERT(this->buf.empty() || (this->buf.size() == 1 && this->buf[0] == '/'))
 
 				// the path will be empty in any case, even if one '/' was present before '?'
@@ -175,7 +179,11 @@ utki::span<const uint8_t> parser::parse_authority(utki::span<const uint8_t> data
 	for (; i != data.end(); ++i) {
 		auto c = char(*i);
 
-		if (c == '/') {
+		if (std::isspace(c, std::locale::classic())) {
+			this->handle_end_of_authority();
+			this->cur_state = state::end;
+			break;
+		} else if (c == '/') {
 			this->handle_end_of_authority();
 			this->cur_state = state::path;
 			++i;
@@ -214,7 +222,11 @@ utki::span<const uint8_t> parser::parse_path(utki::span<const uint8_t> data)
 	for (; i != data.end(); ++i) {
 		auto c = char(*i);
 
-		if (c == '/') {
+		if (std::isspace(c, std::locale::classic())) {
+			this->handle_end_of_path_segment();
+			this->cur_state = state::end;
+			break;
+		} else if (c == '/') {
 			this->handle_end_of_path_segment();
 			continue;
 		} else if (c == '?') {
@@ -241,7 +253,9 @@ utki::span<const uint8_t> parser::parse_query_name(utki::span<const uint8_t> dat
 	for (; i != data.end(); ++i) {
 		auto c = char(*i);
 
-		if (c == '=') {
+		if (std::isspace(c, std::locale::classic())) {
+			throw std::invalid_argument("urlmodel: unexpected whitespace while parsing query parameter name");
+		} else if (c == '=') {
 			this->parsed_query_name = utki::make_string(this->buf);
 			this->buf.clear();
 			this->cur_state = state::query_value;
@@ -268,7 +282,11 @@ utki::span<const uint8_t> parser::parse_query_value(utki::span<const uint8_t> da
 	for (; i != data.end(); ++i) {
 		auto c = char(*i);
 
-		if (c == '&') {
+		if (std::isspace(c, std::locale::classic())) {
+			this->handle_end_of_query_value();
+			this->cur_state = state::end;
+			break;
+		} else if (c == '&') {
 			this->handle_end_of_query_value();
 			this->cur_state = state::query_name;
 			++i;
@@ -306,6 +324,7 @@ utki::span<const uint8_t> parser::parse_fragment(utki::span<const uint8_t> data)
 
 void parser::end_of_data()
 {
+	// feed in whitespace which will indicate URL end
 	uint8_t space = ' ';
 	this->feed(utki::make_span(&space, 1));
 }
