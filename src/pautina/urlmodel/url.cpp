@@ -40,24 +40,30 @@ bool url::operator==(const urlmodel::url& url) const noexcept
 std::string url::to_string() const
 {
 	std::stringstream ss;
-	ss << this->scheme << ':';
-	if (!this->host.empty()) {
-		ss << "//";
-		if (!this->username.empty()) {
-			ss << this->username;
 
-			if (!this->password.empty()) {
-				ss << ':' << this->password;
+	if (!this->scheme.empty()) {
+		ss << this->scheme << ':';
+		if (!this->host.empty()) {
+			ss << "//";
+			if (!this->username.empty()) {
+				ss << this->username;
+
+				if (!this->password.empty()) {
+					ss << ':' << this->password;
+				}
+
+				ss << '@';
 			}
 
-			ss << '@';
-		}
+			ss << this->host;
 
-		ss << this->host;
-
-		if (this->port != 0) {
-			ss << ':' << this->port;
+			if (this->port != 0) {
+				ss << ':' << this->port;
+			}
 		}
+	} else {
+		// start with path
+		ss << '/';
 	}
 
 	if (!this->path.empty()) {

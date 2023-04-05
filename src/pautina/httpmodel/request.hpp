@@ -28,21 +28,24 @@ SOFTWARE.
 
 #include <vector>
 
+#include "../urlmodel/url.hpp"
+
 #include "headers.hpp"
 #include "http.hpp"
 
-namespace pautina::http {
+namespace pautina::httpmodel {
 
 class request
 {
 public:
 	httpmodel::protocol protocol;
 	httpmodel::method method;
-	std::string path;
+
+	urlmodel::url path;
 
 	httpmodel::headers headers;
 
 	std::vector<uint8_t> body;
 };
 
-} // namespace pautina::http
+} // namespace pautina::httpmodel

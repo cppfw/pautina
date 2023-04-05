@@ -34,7 +34,7 @@ SOFTWARE.
 
 #include "util.hxx"
 
-using namespace pautina::http;
+using namespace pautina::httpmodel;
 
 utki::span<const uint8_t> request_parser::parse_method(utki::span<const uint8_t> data)
 {
@@ -57,28 +57,6 @@ utki::span<const uint8_t> request_parser::parse_method(utki::span<const uint8_t>
 		this->buf.push_back(std::toupper(c, std::locale::classic()));
 	}
 	data = data.subspan(std::distance(data.begin(), i));
-	return data;
-}
-
-utki::span<const uint8_t> request_parser::parse_path(utki::span<const uint8_t> data)
-{
-	auto i = data.begin();
-	for (; i != data.end(); ++i) {
-		auto c = char(*i);
-
-		if (c == ' ') {
-			this->request.path = utki::make_string(this->buf);
-			this->buf.clear();
-			this->cur_state = state::skip_spaces;
-			this->state_after_skiping_spaces = state::protocol;
-			++i;
-			break;
-		}
-
-		this->buf.push_back(c);
-	}
-	data = data.subspan(std::distance(data.begin(), i));
-	// std::cout << "parse_path(): data = " << data << std::endl;
 	return data;
 }
 
@@ -167,8 +145,13 @@ utki::span<const uint8_t> request_parser::feed(utki::span<const uint8_t> data)
 				data = this->parse_method(data);
 				break;
 			case state::path:
-				data = this->parse_path(data);
-				// std::cout << "feed(): data = " << data << std::endl;
+				data = this->url_parser.feed(data);
+
+				if (this->url_parser.is_end()) {
+					this->request.path = std::move(this->url_parser.url);
+					this->cur_state = state::skip_spaces;
+					this->state_after_skiping_spaces = state::protocol;
+				}
 				break;
 			case state::protocol:
 				// std::cout << "feed(): data = " << data << std::endl;

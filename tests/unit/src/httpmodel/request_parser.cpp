@@ -4,11 +4,11 @@
 #include <pautina/httpmodel/request_parser.hpp>
 
 namespace{
-std::string print_parsed_http_request(const pautina::http::request& r){
+std::string print_parsed_http_request(const pautina::httpmodel::request& r){
     std::stringstream ss;
 
     ss << "method = " << pautina::httpmodel::method_to_string(r.method) << std::endl;
-    ss << "path = " << r.path << std::endl;
+    ss << "path = " << r.path.to_string() << std::endl;
     ss << "protocol = " << pautina::httpmodel::protocol_to_string(r.protocol) << std::endl;
 
     for(const auto& h : r.headers.get_map()){
@@ -76,7 +76,7 @@ tst::set set("httpmodel__request_parser", [](tst::suite& suite){
             }
         },
         [](const auto& p){
-            pautina::http::request_parser parser;
+            pautina::httpmodel::request_parser parser;
 
             parser.feed(utki::make_span<const uint8_t>(
                 reinterpret_cast<const uint8_t*>(p.first.data()),
@@ -115,7 +115,7 @@ tst::set set("httpmodel__request_parser", [](tst::suite& suite){
                 "Accept: */*" "\n",
         },
         [](const auto& p){
-            pautina::http::request_parser parser;
+            pautina::httpmodel::request_parser parser;
 
             parser.feed(
                 utki::make_span(

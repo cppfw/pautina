@@ -28,7 +28,7 @@ SOFTWARE.
 
 #include <utki/span.hpp>
 
-namespace pautina::http {
+namespace pautina::httpmodel {
 
 /**
  * @brief Skip spaces.
@@ -38,4 +38,4 @@ namespace pautina::http {
  */
 utki::span<const uint8_t> parse_skip_spaces(utki::span<const uint8_t> data);
 
-} // namespace pautina::http
+} // namespace pautina::httpmodel

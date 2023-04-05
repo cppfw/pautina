@@ -31,10 +31,12 @@ SOFTWARE.
 #include <string_view>
 #include <vector>
 
+#include "../urlmodel/parser.hpp"
+
 #include "headers_parser.hpp"
 #include "request.hpp"
 
-namespace pautina::http {
+namespace pautina::httpmodel {
 
 class request_parser
 {
@@ -54,13 +56,12 @@ class request_parser
 	std::vector<char> buf;
 
 	utki::span<const uint8_t> parse_method(utki::span<const uint8_t> data);
-	utki::span<const uint8_t> parse_path(utki::span<const uint8_t> data);
 	utki::span<const uint8_t> parse_protocol(utki::span<const uint8_t> data);
 	utki::span<const uint8_t> parse_body(utki::span<const uint8_t> data);
 
 	std::string header_name; // for storing header name until header value is parsed
 
-	http::headers_parser headers_parser;
+	httpmodel::headers_parser headers_parser;
 
 	void check_required_headers();
 
@@ -68,8 +69,10 @@ class request_parser
 
 	size_t num_body_bytes_expected; // holds number of body bytes remained to read when in state::body
 
+	urlmodel::parser url_parser;
+
 public:
-	http::request request;
+	httpmodel::request request;
 
 	/**
 	 * @brief Feed data portion to parse.
@@ -91,4 +94,4 @@ public:
 	}
 };
 
-} // namespace pautina::http
+} // namespace pautina::httpmodel
