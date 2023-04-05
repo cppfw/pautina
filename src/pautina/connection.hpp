@@ -27,7 +27,10 @@ SOFTWARE.
 #pragma once
 
 #include <setka/tcp_socket.hpp>
+#include <utki/flags.hpp>
 #include <utki/span.hpp>
+
+#include "httpmodel/request_parser.hpp"
 
 namespace pautina {
 
@@ -40,22 +43,18 @@ class connection
 public:
 	connection(setka::tcp_socket&& socket);
 
-	enum class state {
-		receiving,
-		sending
-	};
-
 private:
-	state current_state = state::receiving;
+	// initially connection is ready to receive data
+	utki::flags<opros::ready> cur_status{opros::ready::read};
 
 	// stuff used in 'sending' state
 	std::vector<uint8_t> data_to_send;
 	size_t num_bytes_sent;
 
 public:
-	state state() const noexcept
+	decltype(cur_status) status() const noexcept
 	{
-		return this->current_state;
+		return this->cur_status;
 	}
 
 	void handle_received_data(utki::span<const uint8_t> data);

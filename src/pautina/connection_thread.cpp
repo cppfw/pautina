@@ -35,7 +35,11 @@ connection_thread::connection_thread(http_server& owner, setka::tcp_socket&& soc
 	owner(owner),
 	connection(std::make_unique<pautina::connection>(std::move(socket)))
 {
-	this->wait_set.add(this->connection->socket, opros::ready::read, this->connection.get());
+	this->wait_set.add(
+		this->connection->socket,
+		opros::ready::read, // connection is initially receiving data
+		this->connection.get()
+	);
 }
 
 connection_thread::~connection_thread()
@@ -68,72 +72,67 @@ std::optional<uint32_t> connection_thread::on_loop()
 
 		auto c = reinterpret_cast<pautina::connection*>(t.user_data);
 
-		switch (c->state()) {
-			case connection::state::receiving:
-				{
-					ASSERT(t.flags.get(opros::ready::read))
+		if (c->status().get(opros::ready::read) && t.flags.get(opros::ready::read)) {
+			// data has arrived to socket and connection is able to receive it
 
-					constexpr const size_t receive_buffer_size = 0x1000; // 4kb
-					std::array<uint8_t, receive_buffer_size> buf;
+			constexpr const size_t receive_buffer_size = 0x1000; // 4kb
+			std::array<uint8_t, receive_buffer_size> buf;
 
-					try {
-						bool first_read = true;
-						while (size_t num_bytes_received = c->socket.receive(buf)) {
-							first_read = false;
-							ASSERT(num_bytes_received > 0)
-							c->handle_received_data(utki::make_span(buf.data(), num_bytes_received));
-							if (c->state() == connection::state::sending) {
-								// state has changed to 'sending'
-								this->wait_set.change(c->socket, opros::ready::write, c);
-								break;
-							}
-						}
-						if (first_read) {
-							// zero bytes received right after the object has become ready to read,
-							// this means that the connection was reset by peer
-							LOG([](auto& o) {
-								o << "connection reset by peer, quit thread!" << std::endl;
-							})
-							// destroy thread
-							this->owner.reclaim_thread(*this);
-							break;
-						}
-					} catch (std::exception& e) {
-						LOG([&](auto& o) {
-							o << "std::exception caught while receiving data from socket: " << e.what() << std::endl;
-						})
+			try {
+				bool first_read = true;
+				while (size_t num_bytes_received = c->socket.receive(buf)) {
+					first_read = false;
+					ASSERT(num_bytes_received > 0)
+					c->handle_received_data(utki::make_span(buf.data(), num_bytes_received));
+					if (!c->status().get(opros::ready::read)) {
+						// connection is not ready to receive more data, update waiting flags
+						this->wait_set.change(c->socket, c->status(), c);
+						break;
 					}
 				}
-				break;
-			case connection::state::sending:
-				{
-					ASSERT(t.flags.get(opros::ready::write))
-
-					ASSERT(c->num_bytes_sent < c->data_to_send.size())
-
-					auto span = utki::make_span(
-						c->data_to_send.data() + c->num_bytes_sent,
-						c->data_to_send.size() - c->num_bytes_sent
-					);
-
-					size_t num_bytes_sent = c->socket.send(span);
-
-					ASSERT(num_bytes_sent <= span.size())
-
-					if (num_bytes_sent == span.size()) {
-						c->data_to_send.clear();
-						c->num_bytes_sent = 0;
-
-						c->handle_all_data_sent();
-						if (c->state() == connection::state::receiving) {
-							// state has changed to 'receiving'
-							this->wait_set.change(c->socket, opros::ready::read, c);
-						}
-					} else {
-						c->num_bytes_sent += num_bytes_sent;
-					}
+				if (first_read) {
+					// zero bytes received right after the object has become ready to read,
+					// this means that the connection was reset by peer
+					LOG([](auto& o) {
+						o << "connection reset by peer, quit thread!" << std::endl;
+					})
+					// destroy thread
+					this->owner.reclaim_thread(*this);
+					break;
 				}
-				break;
+			} catch (std::exception& e) {
+				LOG([&](auto& o) {
+					o << "std::exception caught while receiving data from socket: " << e.what() << std::endl;
+				})
+			}
+		}
+
+		if (c->status().get(opros::ready::write) && t.flags.get(opros::ready::write)) {
+			// connection has data to send and socket is ready for sending
+
+			ASSERT(c->num_bytes_sent < c->data_to_send.size())
+
+			auto span =
+				utki::make_span(c->data_to_send.data() + c->num_bytes_sent, c->data_to_send.size() - c->num_bytes_sent);
+
+			size_t num_bytes_sent = c->socket.send(span);
+
+			ASSERT(num_bytes_sent <= span.size())
+
+			if (num_bytes_sent == span.size()) {
+				c->data_to_send.clear();
+				c->num_bytes_sent = 0;
+
+				c->handle_all_data_sent();
+
+				// connection must be able to receive more data
+				ASSERT(c->status().get(opros::ready::read))
+
+				// update waiting flags
+				this->wait_set.change(c->socket, c->status(), c);
+			} else {
+				c->num_bytes_sent += num_bytes_sent;
+			}
 		}
 	}
 
