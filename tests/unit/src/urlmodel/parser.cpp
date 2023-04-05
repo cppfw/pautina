@@ -36,6 +36,9 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             );
 
             parser.feed(span);
+            parser.end_of_data();
+
+            tst::check(parser.is_end(), SL);
 
             tst::check(parser.url == p.second, SL)
                 << "parsed = \n\t" << parser.url.to_string() << "\n"

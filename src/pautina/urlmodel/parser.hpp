@@ -53,8 +53,16 @@ class parser
 	utki::span<const uint8_t> parse_authority_prefix(utki::span<const uint8_t> data);
 	utki::span<const uint8_t> parse_authority(utki::span<const uint8_t> data);
 	utki::span<const uint8_t> parse_path(utki::span<const uint8_t> data);
+	utki::span<const uint8_t> parse_query_name(utki::span<const uint8_t> data);
+	utki::span<const uint8_t> parse_query_value(utki::span<const uint8_t> data);
+	utki::span<const uint8_t> parse_fragment(utki::span<const uint8_t> data);
 
 	void handle_end_of_authority();
+	void handle_end_of_path_segment();
+	void handle_end_of_query_value();
+
+	// for storing query name until query value is parsed
+	std::string parsed_query_name;
 
 public:
 	urlmodel::url url;

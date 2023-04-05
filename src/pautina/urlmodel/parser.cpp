@@ -198,10 +198,116 @@ utki::span<const uint8_t> parser::parse_authority(utki::span<const uint8_t> data
 	return data;
 }
 
+void parser::handle_end_of_path_segment()
+{
+	if (this->buf.empty()) {
+		return;
+	}
+
+	this->url.path.push_back(utki::make_string(this->buf));
+	this->buf.clear();
+}
+
 utki::span<const uint8_t> parser::parse_path(utki::span<const uint8_t> data)
 {
-	// TODO:
-	return nullptr;
+	auto i = data.begin();
+	for (; i != data.end(); ++i) {
+		auto c = char(*i);
+
+		if (c == '/') {
+			this->handle_end_of_path_segment();
+			continue;
+		} else if (c == '?') {
+			this->handle_end_of_path_segment();
+			this->cur_state = state::query_name;
+			++i;
+			break;
+		} else if (c == '#') {
+			this->handle_end_of_path_segment();
+			this->cur_state = state::fragment;
+			++i;
+			break;
+		}
+
+		this->buf.push_back(c);
+	}
+	data = data.subspan(std::distance(data.begin(), i));
+	return data;
+}
+
+utki::span<const uint8_t> parser::parse_query_name(utki::span<const uint8_t> data)
+{
+	auto i = data.begin();
+	for (; i != data.end(); ++i) {
+		auto c = char(*i);
+
+		if (c == '=') {
+			this->parsed_query_name = utki::make_string(this->buf);
+			this->buf.clear();
+			this->cur_state = state::query_value;
+			++i;
+			break;
+		}
+
+		this->buf.push_back(c);
+	}
+	data = data.subspan(std::distance(data.begin(), i));
+	return data;
+}
+
+void parser::handle_end_of_query_value()
+{
+	this->url.query.insert_or_assign(std::move(this->parsed_query_name), utki::make_string(this->buf));
+	this->parsed_query_name.clear();
+	this->buf.clear();
+}
+
+utki::span<const uint8_t> parser::parse_query_value(utki::span<const uint8_t> data)
+{
+	auto i = data.begin();
+	for (; i != data.end(); ++i) {
+		auto c = char(*i);
+
+		if (c == '&') {
+			this->handle_end_of_query_value();
+			this->cur_state = state::query_name;
+			++i;
+			break;
+		} else if (c == '#') {
+			this->handle_end_of_query_value();
+			this->cur_state = state::fragment;
+			++i;
+			break;
+		}
+
+		this->buf.push_back(c);
+	}
+	data = data.subspan(std::distance(data.begin(), i));
+	return data;
+}
+
+utki::span<const uint8_t> parser::parse_fragment(utki::span<const uint8_t> data)
+{
+	auto i = data.begin();
+	for (; i != data.end(); ++i) {
+		auto c = char(*i);
+
+		if (std::isspace(c, std::locale::classic())) {
+			this->url.fragment = utki::make_string(this->buf);
+			this->cur_state = state::end;
+			break;
+		}
+
+		this->buf.push_back(c);
+	}
+	data = data.subspan(std::distance(data.begin(), i));
+	return data;
+}
+
+void parser::end_of_data()
+{
+	uint8_t space = ' ';
+	this->feed(utki::make_span(&space, 1));
 }
 
 utki::span<const uint8_t> parser::feed(utki::span<const uint8_t> data)
@@ -211,16 +317,26 @@ utki::span<const uint8_t> parser::feed(utki::span<const uint8_t> data)
 			case state::scheme:
 				data = this->parse_scheme(data);
 				break;
+			case state::authority_prefix:
+				data = this->parse_authority_prefix(data);
+				break;
 			case state::authority:
 				data = this->parse_authority(data);
 				break;
 			case state::path:
 				data = this->parse_path(data);
 				break;
+			case state::query_name:
+				data = this->parse_query_name(data);
+				break;
+			case state::query_value:
+				data = this->parse_query_value(data);
+				break;
+			case state::fragment:
+				data = this->parse_fragment(data);
+				break;
 			case state::end:
 				return data;
-			default: // TODO: remove default case
-				break;
 		}
 	}
 	return data;
