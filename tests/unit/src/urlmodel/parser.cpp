@@ -9,6 +9,200 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
         "samples",
         {
             {
+                "http:",
+                pautina::urlmodel::url{
+                    .scheme = "http"
+                }
+            },
+            {
+                "http:/", // no authority, path is just '/'
+                pautina::urlmodel::url{
+                    .scheme = "http"
+                }
+            },
+            {
+                "http://", // empty autority
+                pautina::urlmodel::url{
+                    .scheme = "http"
+                }
+            },
+            {
+                "http://user:password@",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .username = "user",
+                    .password = "password"
+                }
+            },
+            {
+                "http://user:password@host.com",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .username = "user",
+                    .password = "password",
+                    .host = "host.com"
+                }
+            },
+            {
+                "http://user:password@",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .username = "user",
+                    .password = "password"
+                }
+            },
+            {
+                "http://user@host.com",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .username = "user",
+                    .host = "host.com"
+                }
+            },
+            {
+                "http://host.com",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .host = "host.com"
+                }
+            },
+            {
+                "http://user:password@host.com:8080",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .username = "user",
+                    .password = "password",
+                    .host = "host.com",
+                    .port = 8080
+                }
+            },
+            {
+                "http://user:password@:8080",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .username = "user",
+                    .password = "password",
+                    .port = 8080
+                }
+            },
+            {
+                "http://:8080",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .port = 8080
+                }
+            },
+            {
+                "http://host.com:8080",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .host = "host.com",
+                    .port = 8080
+                }
+            },
+            {
+                "http://user:password@host.com:8080/path/to/dir",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .username = "user",
+                    .password = "password",
+                    .host = "host.com",
+                    .port = 8080,
+                    .path = {"path", "to", "dir"}
+                }
+            },
+            {
+                "http://user:password@host.com:8080/",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .username = "user",
+                    .password = "password",
+                    .host = "host.com",
+                    .port = 8080
+                }
+            },
+            {
+                "http://user:password@host.com:8080/path",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .username = "user",
+                    .password = "password",
+                    .host = "host.com",
+                    .port = 8080,
+                    .path = {"path"}
+                }
+            },
+            {
+                "http://user:password@host.com:8080/path/to/dir?param1=value1",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .username = "user",
+                    .password = "password",
+                    .host = "host.com",
+                    .port = 8080,
+                    .path = {"path", "to", "dir"},
+                    .query = {
+                        {"param1", "value1"}
+                    },
+                }
+            },
+            {
+                "http://user:password@host.com:8080?param1=value1&param2=value2",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .username = "user",
+                    .password = "password",
+                    .host = "host.com",
+                    .port = 8080,
+                    .query = {
+                        {"param1", "value1"},
+                        {"param2", "value2"}
+                    }
+                }
+            },
+            {
+                "http://user:password@host.com:8080/?param1=value1&param2=value2",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .username = "user",
+                    .password = "password",
+                    .host = "host.com",
+                    .port = 8080,
+                    .query = {
+                        {"param1", "value1"},
+                        {"param2", "value2"}
+                    }
+                }
+            },
+            {
+                "http://user:password@host.com?param1=value1&param2=value2",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .username = "user",
+                    .password = "password",
+                    .host = "host.com",
+                    .query = {
+                        {"param1", "value1"},
+                        {"param2", "value2"}
+                    }
+                }
+            },
+            {
+                "http://user:password@host.com:8080/path/to/dir?param1=value1&param2=value2#",
+                pautina::urlmodel::url{
+                    .scheme = "http",
+                    .username = "user",
+                    .password = "password",
+                    .host = "host.com",
+                    .port = 8080,
+                    .path = {"path", "to", "dir"},
+                    .query = {
+                        {"param1", "value1"},
+                        {"param2", "value2"}
+                    }
+                }
+            },
+            {
                 "http://user:password@host.com:8080/path/to/dir?param1=value1&param2=value2#fragment",
                 pautina::urlmodel::url{
                     .scheme = "http",
