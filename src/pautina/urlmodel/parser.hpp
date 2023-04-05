@@ -72,19 +72,22 @@ public:
 	 * @param data - portion of data to parse.
 	 * @return span remained after parsing. It can be non-empty in case
 	 *     URI end has been encountered in the middle of the fed data.
-	 * @throw std::invalid_argument in case of malformed HTTP header.
+	 * @throw std::invalid_argument in case of malformed URL.
 	 */
 	utki::span<const uint8_t> feed(utki::span<const uint8_t> data);
 
 	/**
 	 * @brief End of input data reached.
-	 * This function tells parser that end of input data has been reached.
+	 * This function tells parser that end of input data has been reached. The parser
+	 * state will be set to 'end'.
+	 * This function doesn't have to be called in case URL is terminated by a whitespace,
+	 * in this case parser state will be set to 'end' when this whitespace is reached.
 	 */
 	void end_of_data();
 
 	/**
-	 * @brief Check if end of HTTP header is reached.
-	 * @return true if end of HTTP header is reached.
+	 * @brief Check if end of URL is reached.
+	 * @return true if end of URL is reached.
 	 * @return false otherwise.
 	 */
 	bool is_end() const noexcept
