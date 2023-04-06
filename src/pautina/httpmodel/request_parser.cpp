@@ -91,7 +91,7 @@ utki::span<const uint8_t> request_parser::parse_protocol(utki::span<const uint8_
 utki::span<const uint8_t> request_parser::parse_body(utki::span<const uint8_t> data)
 {
 	auto num_bytes_to_read = data.size() <= this->num_body_bytes_expected ? data.size() : this->num_body_bytes_expected;
-	std::copy(data.begin(), std::next(data.begin(), num_bytes_to_read), std::back_inserter(this->request.body));
+	std::copy(data.begin(), utki::next(data.begin(), num_bytes_to_read), std::back_inserter(this->request.body));
 	this->num_body_bytes_expected -= num_bytes_to_read;
 	if (this->num_body_bytes_expected == 0) {
 		this->cur_state = state::end;

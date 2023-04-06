@@ -43,7 +43,7 @@ class connection
 public:
 	connection(setka::tcp_socket&& socket);
 
-	virtual ~connection() {}
+	virtual ~connection() = default;
 
 private:
 	// initially connection is ready to receive data

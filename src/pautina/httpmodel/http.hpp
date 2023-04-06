@@ -82,4 +82,12 @@ method method_from_string(std::string_view str);
  */
 std::string_view method_to_string(method m) noexcept;
 
+/**
+ * @brief HTTP response status code.
+ */
+enum class status_code {
+	http_200, // OK
+	http_201 // Created
+};
+
 } // namespace pautina::httpmodel

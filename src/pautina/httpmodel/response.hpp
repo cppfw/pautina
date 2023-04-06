@@ -26,20 +26,23 @@ SOFTWARE.
 
 #pragma once
 
-#include "server.hpp"
+#include <vector>
 
-namespace pautina {
+#include "headers.hpp"
+#include "http.hpp"
 
-class http_server : public server
+namespace pautina::httpmodel {
+
+class response
 {
 public:
-	struct configuration : public server::configuration {};
+	httpmodel::protocol protocol;
 
-	http_server(const configuration& config);
+	status_code status;
 
-	std::unique_ptr<connection> spawn_connection(setka::tcp_socket&& socket) override;
+	httpmodel::headers headers;
 
-	void add(std::vector<std::string> path, std::function<void(const httpmodel::request&)> handler);
+	std::vector<uint8_t> body;
 };
 
-} // namespace pautina
+} // namespace pautina::httpmodel
