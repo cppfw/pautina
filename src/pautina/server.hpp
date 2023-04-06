@@ -27,32 +27,38 @@ SOFTWARE.
 #pragma once
 
 #include <list>
+#include <string>
 
 #include <nitki/loop_thread.hpp>
-#include <nitki/queue.hpp>
-#include <opros/wait_set.hpp>
-#include <setka/tcp_socket.hpp>
+#include <setka/tcp_server_socket.hpp>
 
-#include "connection.hpp"
+#include "connection_thread.hpp"
 
 namespace pautina {
 
-class server;
-
-class connection_thread : public nitki::loop_thread
+class server : public nitki::loop_thread
 {
-	friend class server;
+	friend class connection_thread;
 
-	server& owner;
-	std::list<connection_thread>::iterator owner_iter;
+	setka::tcp_server_socket accept_socket;
 
-	std::unique_ptr<pautina::connection> connection;
+	std::list<connection_thread> threads;
 
-public:
-	connection_thread(server& owner, std::unique_ptr<pautina::connection> conn);
-	~connection_thread() override;
+	void spawn_thread(setka::tcp_socket&& socket);
+
+	void reclaim_thread(connection_thread& t);
 
 	std::optional<uint32_t> on_loop() override;
+
+public:
+	struct configuration {
+		uint16_t port = 80;
+	};
+
+	server(const configuration& config);
+	~server() override;
+
+	virtual std::unique_ptr<connection> spawn_connection(setka::tcp_socket&& socket) = 0;
 };
 
 } // namespace pautina

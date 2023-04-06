@@ -24,35 +24,51 @@ SOFTWARE.
 
 /* ================ LICENSE END ================ */
 
-#pragma once
+#include "server.hpp"
 
-#include <list>
+using namespace pautina;
 
-#include <nitki/loop_thread.hpp>
-#include <nitki/queue.hpp>
-#include <opros/wait_set.hpp>
-#include <setka/tcp_socket.hpp>
-
-#include "connection.hpp"
-
-namespace pautina {
-
-class server;
-
-class connection_thread : public nitki::loop_thread
+server::server(const configuration& config) :
+	nitki::loop_thread(1),
+	accept_socket(config.port)
 {
-	friend class server;
+	this->wait_set.add(this->accept_socket, opros::ready::read, &this->accept_socket);
+}
 
-	server& owner;
-	std::list<connection_thread>::iterator owner_iter;
+server::~server()
+{
+	this->wait_set.remove(this->accept_socket);
+}
 
-	std::unique_ptr<pautina::connection> connection;
+std::optional<uint32_t> server::on_loop()
+{
+	for (const auto& t : this->wait_set.get_triggered()) {
+		if (t.user_data == &this->accept_socket) {
+			auto socket = this->accept_socket.accept();
 
-public:
-	connection_thread(server& owner, std::unique_ptr<pautina::connection> conn);
-	~connection_thread() override;
+			LOG([](auto& o) {
+				o << "connection accepted" << std::endl;
+			})
+			this->spawn_thread(std::move(socket));
+		}
+	}
 
-	std::optional<uint32_t> on_loop() override;
-};
+	return {};
+}
 
-} // namespace pautina
+void server::spawn_thread(setka::tcp_socket&& socket)
+{
+	auto& thread = this->threads.emplace_back(*this, this->spawn_connection(std::move(socket)));
+	thread.owner_iter = std::prev(this->threads.end());
+	thread.start();
+}
+
+void server::reclaim_thread(connection_thread& t)
+{
+	t.quit();
+	// TODO: push to killer thread
+	this->push_back([i = t.owner_iter, this]() {
+		i->join();
+		this->threads.erase(i);
+	});
+}

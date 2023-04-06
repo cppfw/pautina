@@ -26,11 +26,11 @@ SOFTWARE.
 
 #include "connection_thread.hpp"
 
-#include "http_server.hpp"
+#include "server.hpp"
 
 using namespace pautina;
 
-connection_thread::connection_thread(http_server& owner, std::unique_ptr<pautina::connection> conn) :
+connection_thread::connection_thread(server& owner, std::unique_ptr<pautina::connection> conn) :
 	nitki::loop_thread(1),
 	owner(owner),
 	connection(std::move(conn))
