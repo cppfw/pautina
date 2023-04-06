@@ -26,12 +26,17 @@ SOFTWARE.
 
 #pragma once
 
+#include <deque>
+
 #include "connection.hpp"
+
+#include "httpmodel/request_parser.hpp"
 
 namespace pautina {
 
 class http_connection : public connection
 {
+    std::deque<httpmodel::request_parser> requests;
 public:
 	http_connection(setka::tcp_socket&& socket);
 

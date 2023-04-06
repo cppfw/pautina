@@ -89,8 +89,11 @@ std::optional<uint32_t> connection_thread::on_loop()
 					auto prev_status = c->status;
 
 					if (!c->handle_received_data(utki::make_span(buf.data(), num_bytes_received))) {
-						// no more data expected for now
-						c->status.clear(opros::ready::read);
+						// no more data expected for now, clear read flag only if write flag is set,
+						// because if read and write flags are cleared, then the connection becomes a zombie
+						if(c->status.get(opros::ready::write)){
+							c->status.clear(opros::ready::read);
+						}
 					}
 
 					// write flag can also change, so compare statuses as a whole
