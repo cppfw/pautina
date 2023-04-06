@@ -34,17 +34,12 @@ http_connection::http_connection(setka::tcp_socket&& socket) :
 	connection(std::move(socket))
 {}
 
-bool http_connection::handle_received_data(utki::span<const uint8_t> data)
+void http_connection::handle_received_data(utki::span<const uint8_t> data)
 {
 	LOG([&](auto& o) {
 		o << "connection::handle_received_data(): " << utki::make_string(data) << std::endl;
 	})
 	// TODO:
-
-	return true;
 }
 
-bool http_connection::handle_data_sent()
-{
-	return true;
-}
+void http_connection::handle_data_sent() {}

@@ -55,16 +55,22 @@ private:
 
 public:
 	/**
+	 * @brief Turn on/off handle_received_data() notifications.
+	 * @param can_receive - whether to turn on (true) or off (false) the handle_received_data() notifications.
+	 */
+	void set_can_receive_data(bool can_receive);
+
+	/**
 	 * @return true if ready to handle more data.
 	 * @return true if not ready to handle more data.
 	 */
-	virtual bool handle_received_data(utki::span<const uint8_t> data) = 0;
+	virtual void handle_received_data(utki::span<const uint8_t> data) = 0;
 
 	/**
 	 * @return true if ready to receive more data.
 	 * @return true if not ready to receive data.
 	 */
-	virtual bool handle_data_sent() = 0;
+	virtual void handle_data_sent() = 0;
 
 	/**
 	 * @brief Send data over the connection.

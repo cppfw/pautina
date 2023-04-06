@@ -28,21 +28,22 @@ SOFTWARE.
 
 #include <deque>
 
-#include "connection.hpp"
-
 #include "httpmodel/request_parser.hpp"
+
+#include "connection.hpp"
 
 namespace pautina {
 
 class http_connection : public connection
 {
-    std::deque<httpmodel::request_parser> requests;
+	std::deque<httpmodel::request_parser> requests;
+
 public:
 	http_connection(setka::tcp_socket&& socket);
 
-	bool handle_received_data(utki::span<const uint8_t> data) override;
+	void handle_received_data(utki::span<const uint8_t> data) override;
 
-	bool handle_data_sent() override;
+	void handle_data_sent() override;
 };
 
 } // namespace pautina
