@@ -43,6 +43,8 @@ class connection
 public:
 	connection(setka::tcp_socket&& socket);
 
+	virtual ~connection() {}
+
 private:
 	// initially connection is ready to receive data
 	utki::flags<opros::ready> cur_status{opros::ready::read};
@@ -51,15 +53,34 @@ private:
 	std::vector<uint8_t> data_to_send;
 	size_t num_bytes_sent;
 
-public:
 	decltype(cur_status) status() const noexcept
 	{
 		return this->cur_status;
 	}
 
-	void handle_received_data(utki::span<const uint8_t> data);
+public:
+	/**
+	 * @return true if ready to handle more data.
+	 * @return true if not ready to handle more data.
+	 */
+	virtual bool handle_received_data(utki::span<const uint8_t> data);
 
-	void handle_all_data_sent();
+	/**
+	 * @return true if ready to receive more data.
+	 * @return true if not ready to receive data.
+	 */
+	virtual bool handle_data_sent()
+	{
+		return true;
+	}
+
+	/**
+	 * @brief Send data over the connection.
+	 * @param data - data to send.
+	 * @return Empty vector in case the data has been accepted for sending.
+	 * @return Passed in vector in case send buffer is full.
+	 */
+	std::vector<uint8_t> send(std::vector<uint8_t>&& data);
 };
 
 } // namespace pautina

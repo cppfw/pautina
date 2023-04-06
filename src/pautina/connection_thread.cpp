@@ -83,9 +83,17 @@ std::optional<uint32_t> connection_thread::on_loop()
 				while (size_t num_bytes_received = c->socket.receive(buf)) {
 					first_read = false;
 					ASSERT(num_bytes_received > 0)
-					c->handle_received_data(utki::make_span(buf.data(), num_bytes_received));
-					if (!c->status().get(opros::ready::read)) {
-						// connection is not ready to receive more data, update waiting flags
+
+					auto prev_status = c->status();
+
+					if (!c->handle_received_data(utki::make_span(buf.data(), num_bytes_received))) {
+						// no more data expected for now
+						c->cur_status.clear(opros::ready::read);
+					}
+
+					// write flag can also change, so compare statuses as a whole
+					if (c->status() != prev_status) {
+						// connection status has changed, update waiting flags
 						this->wait_set.change(c->socket, c->status(), c);
 						break;
 					}
@@ -107,32 +115,63 @@ std::optional<uint32_t> connection_thread::on_loop()
 			}
 		}
 
-		if (c->status().get(opros::ready::write) && t.flags.get(opros::ready::write)) {
-			// connection has data to send and socket is ready for sending
+		// It shouldn't be possible that socket is ready to write, but connection is
+		// not ready to write, because then we shouldn't be waiting for writing on the socket.
+		ASSERT(!(!c->status().get(opros::ready::write) && t.flags.get(opros::ready::write)))
 
-			ASSERT(c->num_bytes_sent < c->data_to_send.size())
+		if (t.flags.get(opros::ready::write)) {
+			while (true) {
+				// if we were waiting on socket for writing, then connection is ready to write as well
+				ASSERT(c->status().get(opros::ready::write))
 
-			auto span =
-				utki::make_span(c->data_to_send.data() + c->num_bytes_sent, c->data_to_send.size() - c->num_bytes_sent);
+				// connection has data to send and socket is ready for sending
 
-			size_t num_bytes_sent = c->socket.send(span);
+				ASSERT(c->num_bytes_sent < c->data_to_send.size())
 
-			ASSERT(num_bytes_sent <= span.size())
+				auto span = utki::make_span(
+					c->data_to_send.data() + c->num_bytes_sent,
+					c->data_to_send.size() - c->num_bytes_sent
+				);
 
-			if (num_bytes_sent == span.size()) {
-				c->data_to_send.clear();
-				c->num_bytes_sent = 0;
+				size_t num_bytes_sent = c->socket.send(span);
 
-				c->handle_all_data_sent();
+				ASSERT(num_bytes_sent <= span.size())
 
-				// connection must be able to receive more data
-				ASSERT(c->status().get(opros::ready::read))
+				if (num_bytes_sent == span.size()) {
+					c->data_to_send.clear();
+					c->num_bytes_sent = 0;
 
-				// update waiting flags
-				this->wait_set.change(c->socket, c->status(), c);
-			} else {
-				c->num_bytes_sent += num_bytes_sent;
-			}
+					auto old_status = c->status();
+
+					c->cur_status.clear(opros::ready::write);
+					auto is_ready_to_read = c->handle_data_sent();
+
+					if (!c->status().get(opros::ready::write)) {
+						// at least one of the read/write flags must be set,
+						// otherwise the connection will be a zombie
+						c->cur_status.set(opros::ready::read);
+					} else {
+						ASSERT(c->status().get(opros::ready::write))
+
+						c->cur_status.set(opros::ready::read, is_ready_to_read);
+
+						ASSERT(!c->data_to_send.empty())
+						ASSERT(c->num_bytes_sent != c->data_to_send.size())
+						// the socket is possibly still ready to write, try to send more data
+						continue;
+					}
+
+					// read flag can also change, so compare statuses as a whole
+					if (c->status() != old_status) {
+						// connection status has changed, update waiting flags
+						this->wait_set.change(c->socket, c->status(), c);
+					}
+				} else {
+					c->num_bytes_sent += num_bytes_sent;
+				}
+
+				break;
+			} // ~while(true)
 		}
 	}
 

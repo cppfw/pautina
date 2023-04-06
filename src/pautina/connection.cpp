@@ -34,15 +34,26 @@ connection::connection(setka::tcp_socket&& socket) :
 	socket(std::move(socket))
 {}
 
-void connection::handle_all_data_sent()
-{
-	this->cur_status.set(opros::ready::read);
-}
-
-void connection::handle_received_data(utki::span<const uint8_t> data)
+bool connection::handle_received_data(utki::span<const uint8_t> data)
 {
 	LOG([&](auto& o) {
 		o << "connection::handle_received_data(): " << utki::make_string(data) << std::endl;
 	})
 	// TODO:
+
+	return true;
+}
+
+std::vector<uint8_t> connection::send(std::vector<uint8_t>&& data)
+{
+	if (!this->data_to_send.empty()) {
+		return data;
+	}
+
+	this->data_to_send = std::move(data);
+	this->num_bytes_sent = 0;
+
+	this->cur_status.set(opros::ready::write);
+
+	return {};
 }
