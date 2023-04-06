@@ -34,7 +34,7 @@ connection::connection(setka::tcp_socket&& socket) :
 
 std::vector<uint8_t> connection::send(std::vector<uint8_t>&& data)
 {
-	if (!this->data_to_send.empty()) {
+	if (!this->data_to_send.empty() || data.empty()) {
 		return data;
 	}
 
