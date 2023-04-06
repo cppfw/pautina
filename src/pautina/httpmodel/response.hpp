@@ -40,6 +40,8 @@ public:
 
 	status_code status;
 
+	std::string status_text;
+
 	httpmodel::headers headers;
 
 	std::vector<uint8_t> body;

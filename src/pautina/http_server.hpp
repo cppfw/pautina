@@ -26,6 +26,8 @@ SOFTWARE.
 
 #pragma once
 
+#include "httpmodel/response.hpp"
+
 #include "server.hpp"
 
 namespace pautina {
@@ -39,7 +41,15 @@ public:
 
 	std::unique_ptr<connection> spawn_connection(setka::tcp_socket&& socket) override;
 
-	void add(std::vector<std::string> path, std::function<void(const httpmodel::request&)> handler);
+	void add( //
+		std::vector<std::string> path, //
+		std::function< //
+			httpmodel::response( //
+				const httpmodel::request& request, //
+				utki::span<const std::string> subpath //
+			) //
+			> handler
+	);
 };
 
 } // namespace pautina
