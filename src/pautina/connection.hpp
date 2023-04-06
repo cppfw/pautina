@@ -53,13 +53,15 @@ private:
 	std::vector<uint8_t> data_to_send;
 	size_t num_bytes_sent;
 
-public:
+protected:
 	/**
 	 * @brief Turn on/off handle_received_data() notifications.
+	 * Not thread-safe.
 	 * @param can_receive - whether to turn on (true) or off (false) the handle_received_data() notifications.
 	 */
 	void set_can_receive_data(bool can_receive);
 
+public:
 	/**
 	 * @return true if ready to handle more data.
 	 * @return true if not ready to handle more data.
@@ -78,6 +80,7 @@ public:
 	 * @return Empty vector in case the data has been accepted for sending.
 	 * @return Passed in vector in case send buffer is full.
 	 */
+	// TODO: should be thread-safe?
 	std::vector<uint8_t> send(std::vector<uint8_t>&& data);
 };
 

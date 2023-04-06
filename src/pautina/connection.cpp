@@ -48,6 +48,5 @@ std::vector<uint8_t> connection::send(std::vector<uint8_t>&& data)
 
 void connection::set_can_receive_data(bool can_receive)
 {
-	// TODO: should be thread safe? Send message to thread?
 	this->status.set(opros::ready::read, can_receive);
 }
