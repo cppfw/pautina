@@ -55,17 +55,20 @@ void http_connection::handle_received_data(utki::span<const uint8_t> data)
 		try {
 			data = this->requests.back().feed(data);
 		} catch (std::invalid_argument& e) {
-			// TODO: bad request
 			LOG([&](auto& o) {
 				o << "std::invalid_argument while parsing http request: " << e.what() << "\n";
 				o << "data = " << utki::make_string(data) << std::endl;
 			})
 			this->set_can_receive_data(false);
+			// TODO: bad request
 			break;
 		}
 	}
 
-	// TODO:
+	// TODO: handle parsed requests
 }
 
-void http_connection::handle_data_sent() {}
+void http_connection::handle_data_sent()
+{
+	// TODO: handle requests in queue
+}

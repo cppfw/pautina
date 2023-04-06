@@ -75,6 +75,17 @@ public:
 	virtual void handle_data_sent() = 0;
 
 	/**
+	 * @brief Check if send buffer is empty.
+	 * Not thread-safe.
+	 * @return true if send buffer is free and data can be sent over the connection.
+	 * @return false otherwise.
+	 */
+	bool can_send() const noexcept
+	{
+		return !this->status.get(opros::ready::write);
+	}
+
+	/**
 	 * @brief Send data over the connection.
 	 * @param data - data to send.
 	 * @return Empty vector in case the data has been accepted for sending.

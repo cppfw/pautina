@@ -34,6 +34,14 @@ tst::set set("httpmodel__request_parser", [](tst::suite& suite){
                 "protocol = HTTP/1.0" "\n"
             },
             {
+                "GET / HTTP/1.0" "\r\n" // curl sends \r\n line ending here for some reason
+                "\n",
+
+                "method = GET" "\n"
+                "path = /" "\n"
+                "protocol = HTTP/1.0" "\n"
+            },
+            {
                 "GET / HTTP/1.1" "\n"
                 "Host: localhost:8080" "\n"
                 "User-Agent: curl/7.74.0" "\n"
