@@ -36,9 +36,35 @@ http_connection::http_connection(setka::tcp_socket&& socket) :
 
 void http_connection::handle_received_data(utki::span<const uint8_t> data)
 {
+	ASSERT(!data.empty())
+
 	LOG([&](auto& o) {
 		o << "connection::handle_received_data(): " << utki::make_string(data) << std::endl;
 	})
+
+	if (this->requests.empty()) {
+		this->requests.emplace_back();
+	}
+
+	while (!data.empty()) {
+		ASSERT(!this->requests.empty())
+		if (this->requests.back().is_end()) {
+			this->requests.emplace_back();
+		}
+
+		try {
+			data = this->requests.back().feed(data);
+		} catch (std::invalid_argument& e) {
+			// TODO: bad request
+			LOG([&](auto& o) {
+				o << "std::invalid_argument while parsing http request: " << e.what() << "\n";
+				o << "data = " << utki::make_string(data) << std::endl;
+			})
+			this->set_can_receive_data(false);
+			break;
+		}
+	}
+
 	// TODO:
 }
 

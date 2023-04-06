@@ -49,7 +49,7 @@ protocol pautina::httpmodel::protocol_from_string(std::string_view str)
 	auto i = protocol_name_to_enum_mapping.find(str);
 	if (i == protocol_name_to_enum_mapping.end()) {
 		std::stringstream ss;
-		ss << "unknown request protocol: " << str;
+		ss << "unknown request protocol: '" << str << '\'';
 		throw std::invalid_argument(ss.str());
 	}
 

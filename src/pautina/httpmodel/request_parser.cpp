@@ -68,6 +68,11 @@ utki::span<const uint8_t> request_parser::parse_protocol(utki::span<const uint8_
 		auto c = char(*i);
 
 		if (c == '\n') {
+			if (!this->buf.empty() && this->buf.back() == '\r') {
+				// remove trailing carriage return, as it came from DOS line ending
+				this->buf.pop_back();
+			}
+
 			this->request.protocol = httpmodel::protocol_from_string(utki::make_string_view(this->buf));
 
 			this->buf.clear();

@@ -66,6 +66,11 @@ utki::span<const uint8_t> headers_parser::parse_value(utki::span<const uint8_t> 
 		auto c = char(*i);
 
 		if (c == '\n') {
+			if (!this->buf.empty() && this->buf.back() == '\r') {
+				// remove trailing carriage return, as it came from DOS line ending
+				this->buf.pop_back();
+			}
+
 			this->headers.add(std::move(this->header_name), utki::make_string(this->buf));
 			this->buf.clear();
 			this->cur_state = state::name;
