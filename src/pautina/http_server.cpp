@@ -58,8 +58,7 @@ std::optional<uint32_t> http_server::on_loop()
 
 void http_server::spawn_thread(setka::tcp_socket&& socket)
 {
-	auto c = std::make_unique<connection>(std::move(socket));
-	auto& thread = this->threads.emplace_back(*this, std::move(c));
+	auto& thread = this->threads.emplace_back(*this, this->spawn_connection(std::move(socket)));
 	thread.owner_iter = std::prev(this->threads.end());
 	thread.start();
 }
