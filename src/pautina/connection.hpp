@@ -47,16 +47,11 @@ public:
 
 private:
 	// initially connection is ready to receive data
-	utki::flags<opros::ready> cur_status{opros::ready::read};
+	utki::flags<opros::ready> status{opros::ready::read};
 
 	// stuff used in 'sending' state
 	std::vector<uint8_t> data_to_send;
 	size_t num_bytes_sent;
-
-	decltype(cur_status) status() const noexcept
-	{
-		return this->cur_status;
-	}
 
 public:
 	/**

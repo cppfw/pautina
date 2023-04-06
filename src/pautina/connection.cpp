@@ -41,7 +41,7 @@ std::vector<uint8_t> connection::send(std::vector<uint8_t>&& data)
 	this->data_to_send = std::move(data);
 	this->num_bytes_sent = 0;
 
-	this->cur_status.set(opros::ready::write);
+	this->status.set(opros::ready::write);
 
 	return {};
 }
