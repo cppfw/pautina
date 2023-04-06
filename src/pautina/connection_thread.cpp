@@ -30,10 +30,10 @@ SOFTWARE.
 
 using namespace pautina;
 
-connection_thread::connection_thread(http_server& owner, setka::tcp_socket&& socket) :
+connection_thread::connection_thread(http_server& owner, std::unique_ptr<pautina::connection> conn) :
 	nitki::loop_thread(1),
 	owner(owner),
-	connection(std::make_unique<pautina::connection>(std::move(socket)))
+	connection(std::move(conn))
 {
 	this->wait_set.add(
 		this->connection->socket,
@@ -66,6 +66,8 @@ std::optional<uint32_t> connection_thread::on_loop()
 			LOG([](auto& o) {
 				o << "socket error" << std::endl;
 			})
+
+			// TODO: reclaim only connection?
 			this->owner.reclaim_thread(*this);
 			return {};
 		}

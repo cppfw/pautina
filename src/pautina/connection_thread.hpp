@@ -49,7 +49,7 @@ class connection_thread : public nitki::loop_thread
 	std::unique_ptr<pautina::connection> connection;
 
 public:
-	connection_thread(http_server& owner, setka::tcp_socket&& socket);
+	connection_thread(http_server& owner, std::unique_ptr<pautina::connection> conn);
 	~connection_thread() override;
 
 	std::optional<uint32_t> on_loop() override;
