@@ -26,23 +26,11 @@ SOFTWARE.
 
 #include "connection.hpp"
 
-#include <utki/string.hpp>
-
 using namespace pautina;
 
 connection::connection(setka::tcp_socket&& socket) :
 	socket(std::move(socket))
 {}
-
-bool connection::handle_received_data(utki::span<const uint8_t> data)
-{
-	LOG([&](auto& o) {
-		o << "connection::handle_received_data(): " << utki::make_string(data) << std::endl;
-	})
-	// TODO:
-
-	return true;
-}
 
 std::vector<uint8_t> connection::send(std::vector<uint8_t>&& data)
 {

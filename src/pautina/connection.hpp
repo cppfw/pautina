@@ -63,16 +63,13 @@ public:
 	 * @return true if ready to handle more data.
 	 * @return true if not ready to handle more data.
 	 */
-	virtual bool handle_received_data(utki::span<const uint8_t> data);
+	virtual bool handle_received_data(utki::span<const uint8_t> data) = 0;
 
 	/**
 	 * @return true if ready to receive more data.
 	 * @return true if not ready to receive data.
 	 */
-	virtual bool handle_data_sent()
-	{
-		return true;
-	}
+	virtual bool handle_data_sent() = 0;
 
 	/**
 	 * @brief Send data over the connection.
