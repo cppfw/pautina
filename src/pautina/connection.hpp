@@ -40,8 +40,10 @@ class connection
 {
 	friend class connection_thread;
 
+protected:
 	connection_thread& owner;
 
+private:
 	setka::tcp_socket socket;
 
 public:
