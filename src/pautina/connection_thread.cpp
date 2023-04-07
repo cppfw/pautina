@@ -30,17 +30,10 @@ SOFTWARE.
 
 using namespace pautina;
 
-connection_thread::connection_thread(server& owner, std::unique_ptr<pautina::connection> conn) :
+connection_thread::connection_thread(server& owner) :
 	nitki::loop_thread(1),
-	owner(owner),
-	connection(std::move(conn))
-{
-	this->wait_set.add(
-		this->connection->socket,
-		opros::ready::read, // connection is initially receiving data
-		this->connection.get()
-	);
-}
+	owner(owner)
+{}
 
 connection_thread::~connection_thread()
 {
@@ -48,6 +41,20 @@ connection_thread::~connection_thread()
 	LOG([](auto& o) {
 		o << "connection_thread destroyed" << std::endl;
 	})
+}
+
+void connection_thread::push(std::unique_ptr<pautina::connection> conn)
+{
+	this->push_back([this, c = conn.release()]() mutable {
+		ASSERT(!this->connection)
+		this->connection.reset(c);
+
+		this->wait_set.add(
+			this->connection->socket,
+			opros::ready::read, // connection is initially receiving data
+			this->connection.get()
+		);
+	});
 }
 
 std::optional<uint32_t> connection_thread::on_loop()

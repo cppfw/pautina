@@ -34,14 +34,18 @@ SOFTWARE.
 
 namespace pautina {
 
+class connection_thread;
+
 class connection
 {
 	friend class connection_thread;
 
+	connection_thread& owner;
+
 	setka::tcp_socket socket;
 
 public:
-	connection(setka::tcp_socket&& socket);
+	connection(connection_thread& owner, setka::tcp_socket&& socket);
 
 	virtual ~connection() = default;
 

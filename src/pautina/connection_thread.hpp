@@ -46,13 +46,16 @@ class connection_thread : public nitki::loop_thread
 	server& owner;
 	std::list<connection_thread>::iterator owner_iter;
 
+	// TODO: handle several connections
 	std::unique_ptr<pautina::connection> connection;
 
 public:
-	connection_thread(server& owner, std::unique_ptr<pautina::connection> conn);
+	connection_thread(server& owner);
 	~connection_thread() override;
 
 	std::optional<uint32_t> on_loop() override;
+
+	void push(std::unique_ptr<pautina::connection> conn);
 };
 
 } // namespace pautina
