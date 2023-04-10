@@ -26,9 +26,27 @@ SOFTWARE.
 
 #pragma once
 
+#include <functional>
+#include <string>
+#include <vector>
+
+#include <utki/span.hpp>
+
+#include "../httpmodel/request.hpp"
+#include "../httpmodel/response.hpp"
+
 namespace pautina::http {
 
-class http_router
-{};
+struct route {
+	std::vector<std::string> path;
+
+	std::function< //
+		httpmodel::response( //
+			const httpmodel::request& request, //
+			utki::span<const std::string> subpath //
+		) //
+		>
+		handler;
+};
 
 } // namespace pautina::http

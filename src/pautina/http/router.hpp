@@ -26,19 +26,16 @@ SOFTWARE.
 
 #pragma once
 
-#include "../httpmodel/response.hpp"
-#include "../server.hpp"
+#include "route.hpp"
 
 namespace pautina::http {
 
-class server : public pautina::server
+class router
 {
+	// routes are sorted by path
+	std::vector<route> sorted_routes;
+
 public:
-	struct configuration : public pautina::server::configuration {};
-
-	server(const configuration& config);
-
-	std::unique_ptr<connection> spawn_connection(setka::tcp_socket&& socket) override;
 };
 
 } // namespace pautina::http
