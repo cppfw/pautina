@@ -45,6 +45,7 @@ connection_thread::~connection_thread()
 
 void connection_thread::push(std::unique_ptr<pautina::connection> conn)
 {
+	// TODO: use shared_ref?
 	this->push_back([this, c = conn.release()]() mutable {
 		ASSERT(!this->connection)
 		this->connection.reset(c);

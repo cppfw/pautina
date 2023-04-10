@@ -28,8 +28,7 @@ SOFTWARE.
 
 using namespace pautina;
 
-connection::connection(connection_thread& owner, setka::tcp_socket&& socket) :
-	owner(owner),
+connection::connection(setka::tcp_socket&& socket) :
 	socket(std::move(socket))
 {}
 

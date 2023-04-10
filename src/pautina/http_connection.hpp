@@ -39,7 +39,7 @@ class http_connection : public connection
 	std::deque<httpmodel::request_parser> requests;
 
 public:
-	http_connection(connection_thread& owner, setka::tcp_socket&& socket);
+	http_connection(setka::tcp_socket&& socket);
 
 	void handle_received_data(utki::span<const uint8_t> data) override;
 

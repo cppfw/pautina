@@ -39,7 +39,7 @@ public:
 
 	http_server(const configuration& config);
 
-	std::unique_ptr<connection> spawn_connection(connection_thread& owner, setka::tcp_socket&& socket) override;
+	std::unique_ptr<connection> spawn_connection(setka::tcp_socket&& socket) override;
 
 	void add( //
 		std::vector<std::string> path, //

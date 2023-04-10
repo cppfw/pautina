@@ -62,7 +62,7 @@ void server::spawn_thread(setka::tcp_socket&& socket)
 	thread.owner_iter = std::prev(this->threads.end());
 	thread.start();
 
-	thread.push(this->spawn_connection(thread, std::move(socket)));
+	thread.push(this->spawn_connection(std::move(socket)));
 }
 
 void server::reclaim_thread(connection_thread& t)
