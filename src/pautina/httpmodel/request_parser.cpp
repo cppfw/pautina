@@ -34,7 +34,7 @@ SOFTWARE.
 
 #include "util.hxx"
 
-using namespace pautina::httpmodel;
+using namespace httpmodel;
 
 utki::span<const uint8_t> request_parser::parse_method(utki::span<const uint8_t> data)
 {

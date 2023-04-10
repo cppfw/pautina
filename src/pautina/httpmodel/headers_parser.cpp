@@ -30,7 +30,7 @@ SOFTWARE.
 
 #include "util.hxx"
 
-using namespace pautina::httpmodel;
+using namespace httpmodel;
 
 utki::span<const uint8_t> headers_parser::parse_name(utki::span<const uint8_t> data)
 {

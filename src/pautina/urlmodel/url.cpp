@@ -28,7 +28,7 @@ SOFTWARE.
 
 #include <sstream>
 
-using namespace pautina::urlmodel;
+using namespace urlmodel;
 
 bool url::operator==(const urlmodel::url& url) const noexcept
 {

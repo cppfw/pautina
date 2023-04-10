@@ -30,7 +30,7 @@ SOFTWARE.
 
 #include "url.hpp"
 
-namespace pautina::urlmodel {
+namespace urlmodel {
 
 class parser
 {
@@ -96,4 +96,4 @@ public:
 	}
 };
 
-} // namespace pautina::urlmodel
+} // namespace urlmodel

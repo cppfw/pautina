@@ -30,7 +30,7 @@ SOFTWARE.
 #include <string>
 #include <vector>
 
-namespace pautina::urlmodel {
+namespace urlmodel {
 
 class url
 {
@@ -52,4 +52,4 @@ public:
 	std::string to_string() const;
 };
 
-} // namespace pautina::urlmodel
+} // namespace urlmodel

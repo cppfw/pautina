@@ -26,7 +26,7 @@ SOFTWARE.
 
 #include "util.hxx"
 
-utki::span<const uint8_t> pautina::httpmodel::parse_skip_spaces(utki::span<const uint8_t> data)
+utki::span<const uint8_t> httpmodel::parse_skip_spaces(utki::span<const uint8_t> data)
 {
 	auto i = data.begin();
 	for (; i != data.end(); ++i) {

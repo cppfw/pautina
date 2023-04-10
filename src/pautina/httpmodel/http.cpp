@@ -32,7 +32,7 @@ SOFTWARE.
 #include <utki/debug.hpp>
 #include <utki/util.hpp>
 
-using namespace pautina::httpmodel;
+using namespace httpmodel;
 
 namespace {
 const std::map<std::string_view, protocol> protocol_name_to_enum_mapping = {
@@ -44,7 +44,7 @@ const std::map<std::string_view, protocol> protocol_name_to_enum_mapping = {
 const auto protocol_enum_to_name_mapping = utki::flip_map(protocol_name_to_enum_mapping);
 } // namespace
 
-protocol pautina::httpmodel::protocol_from_string(std::string_view str)
+protocol httpmodel::protocol_from_string(std::string_view str)
 {
 	auto i = protocol_name_to_enum_mapping.find(str);
 	if (i == protocol_name_to_enum_mapping.end()) {
@@ -56,7 +56,7 @@ protocol pautina::httpmodel::protocol_from_string(std::string_view str)
 	return i->second;
 }
 
-std::string_view pautina::httpmodel::protocol_to_string(protocol p) noexcept
+std::string_view httpmodel::protocol_to_string(protocol p) noexcept
 {
 	auto i = protocol_enum_to_name_mapping.find(p);
 	ASSERT(i != protocol_enum_to_name_mapping.end())
@@ -79,7 +79,7 @@ const std::map<std::string_view, method> method_name_to_enum_mapping = {
 const auto method_enum_to_name_mapping = utki::flip_map(method_name_to_enum_mapping);
 } // namespace
 
-method pautina::httpmodel::method_from_string(std::string_view str)
+method httpmodel::method_from_string(std::string_view str)
 {
 	auto i = method_name_to_enum_mapping.find(str);
 	if (i == method_name_to_enum_mapping.end()) {
@@ -90,7 +90,7 @@ method pautina::httpmodel::method_from_string(std::string_view str)
 	return i->second;
 }
 
-std::string_view pautina::httpmodel::method_to_string(method m) noexcept
+std::string_view httpmodel::method_to_string(method m) noexcept
 {
 	auto i = method_enum_to_name_mapping.find(m);
 	ASSERT(i != method_enum_to_name_mapping.end())

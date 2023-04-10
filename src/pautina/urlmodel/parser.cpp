@@ -28,7 +28,7 @@ SOFTWARE.
 
 #include <utki/string.hpp>
 
-using namespace pautina::urlmodel;
+using namespace urlmodel;
 
 utki::span<const uint8_t> parser::parse_scheme(utki::span<const uint8_t> data)
 {

@@ -31,7 +31,7 @@ SOFTWARE.
 #include <string>
 #include <string_view>
 
-namespace pautina::httpmodel {
+namespace httpmodel {
 
 enum class header {
 	// WARNING: do not change order, add new items to the end of enum
@@ -61,4 +61,4 @@ public:
 	}
 };
 
-} // namespace pautina::httpmodel
+} // namespace httpmodel

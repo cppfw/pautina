@@ -8,7 +8,7 @@ tst::set set("http__headers", [](tst::suite& suite){
     suite.add(
         "add_get",
         [](){
-            pautina::httpmodel::headers h;
+            httpmodel::headers h;
 
             h.add("Host", "blabla.com");
 

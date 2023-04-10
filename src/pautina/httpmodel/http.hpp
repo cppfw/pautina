@@ -28,7 +28,7 @@ SOFTWARE.
 
 #include <string_view>
 
-namespace pautina::httpmodel {
+namespace httpmodel {
 
 enum class protocol {
 	// order is ascending by protocol version
@@ -90,4 +90,4 @@ enum class status_code {
 	http_201 // Created
 };
 
-} // namespace pautina::httpmodel
+} // namespace httpmodel

@@ -34,7 +34,7 @@ SOFTWARE.
 
 #include "headers.hpp"
 
-namespace pautina::httpmodel {
+namespace httpmodel {
 
 class headers_parser
 {
@@ -78,4 +78,4 @@ public:
 	}
 };
 
-} // namespace pautina::httpmodel
+} // namespace httpmodel

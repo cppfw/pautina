@@ -5,30 +5,30 @@
 
 namespace{
 tst::set set("urlmodel__parser", [](tst::suite& suite){
-    suite.add<std::pair<std::string, pautina::urlmodel::url>>(
+    suite.add<std::pair<std::string, urlmodel::url>>(
         "samples",
         {
             {
                 "http:",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http"
                 }
             },
             {
                 "http:/", // no authority, path is just '/'
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http"
                 }
             },
             {
                 "http://", // empty autority
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http"
                 }
             },
             {
                 "http://user:password@",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .password = "password"
@@ -36,7 +36,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://user:password@host.com",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .password = "password",
@@ -45,7 +45,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://user:password@",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .password = "password"
@@ -53,7 +53,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://user@host.com",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .host = "host.com"
@@ -61,14 +61,14 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://host.com",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .host = "host.com"
                 }
             },
             {
                 "http://user:password@host.com:8080",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .password = "password",
@@ -78,7 +78,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://user:password@:8080",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .password = "password",
@@ -87,14 +87,14 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://:8080",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .port = 8080
                 }
             },
             {
                 "http://host.com:8080",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .host = "host.com",
                     .port = 8080
@@ -102,7 +102,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://user:password@host.com:8080/path/to/dir",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .password = "password",
@@ -113,7 +113,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://user:password@host.com:8080/",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .password = "password",
@@ -123,7 +123,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://user:password@host.com:8080/path",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .password = "password",
@@ -134,7 +134,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://user:password@host.com:8080/path/to/dir?param1=value1",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .password = "password",
@@ -148,7 +148,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://user:password@host.com:8080?param1=value1&param2=value2",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .password = "password",
@@ -162,7 +162,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://user:password@host.com:8080/?param1=value1&param2=value2",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .password = "password",
@@ -176,7 +176,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://user:password@host.com?param1=value1&param2=value2",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .password = "password",
@@ -189,7 +189,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://user:password@host.com:8080/path/to/dir?param1=value1&param2=value2#",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .password = "password",
@@ -204,17 +204,17 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "/",
-                pautina::urlmodel::url{}
+                urlmodel::url{}
             },
             {
                 "/path/to/dir",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .path = {"path", "to", "dir"},
                 }
             },
             {
                 "/path/to/dir?param1=value1",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .path = {"path", "to", "dir"},
                     .query = {
                         {"param1", "value1"}
@@ -223,7 +223,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "/path/to/dir?param1=value1&param2=value2",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .path = {"path", "to", "dir"},
                     .query = {
                         {"param1", "value1"},
@@ -233,7 +233,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "/?param1=value1&param2=value2",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .query = {
                         {"param1", "value1"},
                         {"param2", "value2"}
@@ -242,20 +242,20 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "/#fragment",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .fragment = "fragment"
                 }
             },
             {
                 "/path/to/dir#fragment",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .path = {"path", "to", "dir"},
                     .fragment = "fragment"
                 }
             },
             {
                 "/path/to/dir?param1=value1&param2=value2#fragment",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .path = {"path", "to", "dir"},
                     .query = {
                         {"param1", "value1"},
@@ -266,7 +266,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             },
             {
                 "http://user:password@host.com:8080/path/to/dir?param1=value1&param2=value2#fragment",
-                pautina::urlmodel::url{
+                urlmodel::url{
                     .scheme = "http",
                     .username = "user",
                     .password = "password",
@@ -282,7 +282,7 @@ tst::set set("urlmodel__parser", [](tst::suite& suite){
             }
         },
         [](const auto& p){
-            pautina::urlmodel::parser parser;
+            urlmodel::parser parser;
 
             // TODO: feed by several batches
 

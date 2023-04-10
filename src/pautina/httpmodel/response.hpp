@@ -31,7 +31,7 @@ SOFTWARE.
 #include "headers.hpp"
 #include "http.hpp"
 
-namespace pautina::httpmodel {
+namespace httpmodel {
 
 class response
 {
@@ -47,4 +47,4 @@ public:
 	std::vector<uint8_t> body;
 };
 
-} // namespace pautina::httpmodel
+} // namespace httpmodel
