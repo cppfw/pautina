@@ -25,3 +25,35 @@ SOFTWARE.
 /* ================ LICENSE END ================ */
 
 #include "router.hpp"
+
+using namespace pautina::http;
+
+namespace {
+bool is_less(const std::vector<std::string>& a, const std::vector<std::string>& b)
+{
+	auto i = a.begin();
+	auto j = b.begin();
+
+	for (; i != a.end() && j != b.end(); ++i, ++j) {
+		if (a < b) {
+			continue;
+		}
+		break;
+	}
+
+	return a.size() < b.size();
+}
+} // namespace
+
+router::router(decltype(sorted_routes)&& routes) :
+	sorted_routes(std::move(routes))
+
+{
+	std::sort( //
+		this->sorted_routes.begin(),
+		this->sorted_routes.end(),
+		[](const auto& a, const auto& b) {
+			return is_less(a.path, b.path);
+		}
+	);
+}

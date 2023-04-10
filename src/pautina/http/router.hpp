@@ -36,6 +36,7 @@ class router
 	std::vector<route> sorted_routes;
 
 public:
+	router(decltype(sorted_routes)&& routes);
 };
 
 } // namespace pautina::http
