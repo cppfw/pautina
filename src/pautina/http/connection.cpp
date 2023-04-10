@@ -24,17 +24,17 @@ SOFTWARE.
 
 /* ================ LICENSE END ================ */
 
-#include "http_connection.hpp"
+#include "connection.hpp"
 
 #include <utki/string.hpp>
 
-using namespace pautina;
+using namespace pautina::http;
 
-http_connection::http_connection(setka::tcp_socket&& socket) :
-	connection(std::move(socket))
+connection::connection(setka::tcp_socket&& socket) :
+	pautina::connection(std::move(socket))
 {}
 
-void http_connection::handle_received_data(utki::span<const uint8_t> data)
+void connection::handle_received_data(utki::span<const uint8_t> data)
 {
 	ASSERT(!data.empty())
 
@@ -68,7 +68,7 @@ void http_connection::handle_received_data(utki::span<const uint8_t> data)
 	// TODO: handle parsed requests
 }
 
-void http_connection::handle_data_sent()
+void connection::handle_data_sent()
 {
 	// TODO: handle requests in queue
 }

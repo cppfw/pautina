@@ -24,17 +24,11 @@ SOFTWARE.
 
 /* ================ LICENSE END ================ */
 
-#include "http_server.hpp"
+#pragma once
 
-#include "http_connection.hpp"
+namespace pautina::http {
 
-using namespace pautina;
+class http_router
+{};
 
-http_server::http_server(const configuration& config) :
-	server(config)
-{}
-
-std::unique_ptr<connection> http_server::spawn_connection(setka::tcp_socket&& socket)
-{
-	return std::make_unique<http_connection>(std::move(socket));
-}
+} // namespace pautina::http

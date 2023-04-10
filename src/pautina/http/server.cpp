@@ -24,32 +24,17 @@ SOFTWARE.
 
 /* ================ LICENSE END ================ */
 
-#pragma once
-
-#include "httpmodel/response.hpp"
-
 #include "server.hpp"
 
-namespace pautina {
+#include "connection.hpp"
 
-class http_server : public server
+using namespace pautina::http;
+
+server::server(const configuration& config) :
+	pautina::server(config)
+{}
+
+std::unique_ptr<pautina::connection> server::spawn_connection(setka::tcp_socket&& socket)
 {
-public:
-	struct configuration : public server::configuration {};
-
-	http_server(const configuration& config);
-
-	std::unique_ptr<connection> spawn_connection(setka::tcp_socket&& socket) override;
-
-	void add( //
-		std::vector<std::string> path, //
-		std::function< //
-			httpmodel::response( //
-				const httpmodel::request& request, //
-				utki::span<const std::string> subpath //
-			) //
-			> handler
-	);
-};
-
-} // namespace pautina
+	return std::make_unique<connection>(std::move(socket));
+}
