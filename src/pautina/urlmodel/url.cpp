@@ -99,7 +99,11 @@ bool less::operator()(utki::span<const std::string> a, utki::span<const std::str
 	auto j = b.begin();
 
 	for (; i != a.end() && j != b.end(); ++i, ++j) {
-		if (!(*i < *j)) {
+		auto res = i->compare(*j);
+
+		if (res < 0) {
+			return true;
+		} else if (res > 0) {
 			return false;
 		}
 	}
