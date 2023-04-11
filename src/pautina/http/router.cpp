@@ -28,32 +28,13 @@ SOFTWARE.
 
 using namespace pautina::http;
 
-namespace {
-bool is_less(const std::vector<std::string>& a, const std::vector<std::string>& b)
-{
-	auto i = a.begin();
-	auto j = b.begin();
-
-	for (; i != a.end() && j != b.end(); ++i, ++j) {
-		if (a < b) {
-			continue;
-		}
-		break;
-	}
-
-	return a.size() < b.size();
-}
-} // namespace
-
-router::router(decltype(sorted_routes)&& routes) :
-	sorted_routes([routes = std::move(routes)]() mutable {
-		std::sort( //
-			routes.begin(),
-			routes.end(),
-			[](const auto& a, const auto& b) {
-				return is_less(a.path, b.path);
-			}
-		);
-		return std::move(routes);
-	}())
+router::router(decltype(routes)&& routes) :
+	routes(std::move(routes))
 {}
+
+httpmodel::response router::route(const httpmodel::request& req) const
+{
+	// TODO:
+
+	return {.status = httpmodel::status_code::http_404};
+}

@@ -87,7 +87,10 @@ std::string_view method_to_string(method m) noexcept;
  */
 enum class status_code {
 	http_200, // OK
-	http_201 // Created
+	http_201, // Created
+	// TODO: add all status codes
+	http_404, // Not Found
+
 	// TODO: add all status codes
 };
 

@@ -66,8 +66,8 @@ std::string url::to_string() const
 		ss << '/';
 	}
 
-	if (!this->path.empty()) {
-		for (const auto& p : this->path) {
+	if (!this->path.parts.empty()) {
+		for (const auto& p : this->path.parts) {
 			ss << '/' << p;
 		}
 	}
@@ -91,4 +91,20 @@ std::string url::to_string() const
 	}
 
 	return ss.str();
+}
+
+bool path::operator<(const path& p) const noexcept
+{
+	auto i = this->parts.begin();
+	auto j = p.parts.begin();
+
+	for (; i != this->parts.end() && j != p.parts.end(); ++i, ++j) {
+		if (*i < *j) {
+			continue;
+		}
+
+		return false;
+	}
+
+	return this->parts.size() < this->parts.size();
 }

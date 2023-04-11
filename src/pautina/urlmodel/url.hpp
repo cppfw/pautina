@@ -32,6 +32,25 @@ SOFTWARE.
 
 namespace urlmodel {
 
+class path
+{
+public:
+	std::vector<std::string> parts;
+
+	path() = default;
+
+	path(std::initializer_list<std::string> il) :
+		parts{il}
+	{}
+
+	bool operator<(const path& p) const noexcept;
+
+	bool operator==(const path& p) const noexcept
+	{
+		return this->parts == p.parts;
+	}
+};
+
 class url
 {
 public:
@@ -43,7 +62,7 @@ public:
 	std::string host;
 	uint16_t port = 0;
 
-	std::vector<std::string> path;
+	urlmodel::path path;
 	std::map<std::string, std::string> query;
 	std::string fragment;
 

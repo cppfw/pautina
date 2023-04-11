@@ -26,17 +26,31 @@ SOFTWARE.
 
 #pragma once
 
-#include "route.hpp"
+#include <functional>
+#include <map>
+
+#include <utki/span.hpp>
+
+#include "../httpmodel/request.hpp"
+#include "../httpmodel/response.hpp"
 
 namespace pautina::http {
 
+using route_handler_type = std::function< //
+	httpmodel::response( //
+		const httpmodel::request& request, //
+		utki::span<const std::string> subpath //
+	) //
+	>;
+
 class router
 {
-	// routes are sorted by path
-	const std::vector<route> sorted_routes;
+	const std::map<urlmodel::path, route_handler_type> routes;
 
 public:
-	router(decltype(sorted_routes)&& routes);
+	router(decltype(routes)&& routes);
+
+	httpmodel::response route(const httpmodel::request& req) const;
 };
 
 } // namespace pautina::http
