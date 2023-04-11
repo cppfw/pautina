@@ -30,8 +30,9 @@ SOFTWARE.
 
 using namespace pautina::http;
 
-server::server(const configuration& config) :
-	pautina::server(config)
+server::server(const configuration& config, router::routes_type&& routes) :
+	pautina::server(config),
+	router(std::move(routes))
 {}
 
 std::unique_ptr<pautina::connection> server::spawn_connection(setka::tcp_socket&& socket)

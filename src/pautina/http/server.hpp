@@ -29,14 +29,18 @@ SOFTWARE.
 #include "../httpmodel/response.hpp"
 #include "../server.hpp"
 
+#include "router.hpp"
+
 namespace pautina::http {
 
 class server : public pautina::server
 {
+	pautina::http::router router;
+
 public:
 	struct configuration : public pautina::server::configuration {};
 
-	server(const configuration& config);
+	server(const configuration& config, router::routes_type&& routes);
 
 	std::unique_ptr<connection> spawn_connection(setka::tcp_socket&& socket) override;
 };
