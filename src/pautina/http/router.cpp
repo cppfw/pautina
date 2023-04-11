@@ -28,7 +28,7 @@ SOFTWARE.
 
 using namespace pautina::http;
 
-router::router(decltype(routes)&& routes) :
+router::router(routes_type&& routes) :
 	routes(std::move(routes))
 {}
 
@@ -37,6 +37,7 @@ httpmodel::response router::route(const httpmodel::request& req) const
 	auto path = utki::make_span(req.url.path);
 
 	while (true) {
+		// std::cout << "path = " << path << std::endl;
 		auto i = this->routes.find(path);
 		if (i != this->routes.end()) {
 			return i->second(req, utki::make_span(req.url.path).subspan(path.size()));

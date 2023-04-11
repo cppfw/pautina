@@ -45,10 +45,14 @@ using route_handler_type = std::function< //
 
 class router
 {
-	const std::map<std::vector<std::string>, route_handler_type, urlmodel::less> routes;
+public:
+	using routes_type = std::map<std::vector<std::string>, route_handler_type, urlmodel::less>;
+
+private:
+	const routes_type routes;
 
 public:
-	router(decltype(routes)&& routes);
+	router(routes_type&& routes);
 
 	httpmodel::response route(const httpmodel::request& req) const;
 };

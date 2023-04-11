@@ -104,7 +104,7 @@ bool less::operator()(utki::span<const std::string> a, utki::span<const std::str
 		}
 	}
 
-	if (i == a.end()) {
+	if (j != b.end()) {
 		return true;
 	}
 
