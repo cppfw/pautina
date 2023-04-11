@@ -31,14 +31,18 @@ SOFTWARE.
 #include "../connection.hpp"
 #include "../httpmodel/request_parser.hpp"
 
+#include "server.hpp"
+
 namespace pautina::http {
 
 class connection : public pautina::connection
 {
 	std::deque<httpmodel::request_parser> requests;
 
+	const pautina::http::server& owner;
+
 public:
-	connection(setka::tcp_socket&& socket);
+	connection(setka::tcp_socket&& socket, const pautina::http::server& owner);
 
 	void handle_received_data(utki::span<const uint8_t> data) override;
 

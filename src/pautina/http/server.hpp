@@ -42,7 +42,7 @@ public:
 
 	server(const configuration& config, router::routes_type&& routes);
 
-	std::unique_ptr<connection> spawn_connection(setka::tcp_socket&& socket) override;
+	std::unique_ptr<connection> spawn_connection(setka::tcp_socket&& socket) const override;
 };
 
 } // namespace pautina::http

@@ -54,6 +54,9 @@ private:
 public:
 	router(routes_type&& routes);
 
+	// thread-safe:
+	// it is ok to call this method from concurrent threads, because it does not modify
+	// the routes map
 	httpmodel::response route(const httpmodel::request& req) const;
 };
 

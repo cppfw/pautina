@@ -35,7 +35,7 @@ server::server(const configuration& config, router::routes_type&& routes) :
 	router(std::move(routes))
 {}
 
-std::unique_ptr<pautina::connection> server::spawn_connection(setka::tcp_socket&& socket)
+std::unique_ptr<pautina::connection> server::spawn_connection(setka::tcp_socket&& socket) const
 {
-	return std::make_unique<connection>(std::move(socket));
+	return std::make_unique<connection>(std::move(socket), *this);
 }

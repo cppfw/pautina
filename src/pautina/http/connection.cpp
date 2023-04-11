@@ -30,8 +30,9 @@ SOFTWARE.
 
 using namespace pautina::http;
 
-connection::connection(setka::tcp_socket&& socket) :
-	pautina::connection(std::move(socket))
+connection::connection(setka::tcp_socket&& socket, const pautina::http::server& owner) :
+	pautina::connection(std::move(socket)),
+	owner(owner)
 {}
 
 void connection::handle_received_data(utki::span<const uint8_t> data)
