@@ -36,17 +36,20 @@ httpmodel::response router::route(const httpmodel::request& req) const
 {
 	auto path = utki::make_span(req.url.path);
 
-	while (!path.empty()) {
+	while (true) {
 		auto i = this->routes.find(path);
 		if (i != this->routes.end()) {
 			return i->second(req, utki::make_span(req.url.path).subspan(path.size()));
 		}
 
-		// TODO: handle empty path
+		if (path.empty()) {
+			break;
+		}
+
+		ASSERT(path.size() != 0)
+
 		path = path.subspan(0, path.size() - 1);
 	}
-
-	// TODO:
 
 	return {.status = httpmodel::status_code::http_404};
 }
