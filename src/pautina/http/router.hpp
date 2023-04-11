@@ -45,7 +45,7 @@ using route_handler_type = std::function< //
 
 class router
 {
-	const std::map<urlmodel::path, route_handler_type> routes;
+	const std::map<std::vector<std::string>, route_handler_type, urlmodel::less> routes;
 
 public:
 	router(decltype(routes)&& routes);

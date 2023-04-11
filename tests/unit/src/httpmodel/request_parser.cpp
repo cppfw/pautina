@@ -8,7 +8,7 @@ std::string print_parsed_http_request(const httpmodel::request& r){
     std::stringstream ss;
 
     ss << "method = " << httpmodel::method_to_string(r.method) << std::endl;
-    ss << "path = " << r.path.to_string() << std::endl;
+    ss << "path = " << r.url.to_string() << std::endl;
     ss << "protocol = " << httpmodel::protocol_to_string(r.protocol) << std::endl;
 
     for(const auto& h : r.headers.get_map()){

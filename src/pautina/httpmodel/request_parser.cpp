@@ -153,7 +153,7 @@ utki::span<const uint8_t> request_parser::feed(utki::span<const uint8_t> data)
 				data = this->url_parser.feed(data);
 
 				if (this->url_parser.is_end()) {
-					this->request.path = std::move(this->url_parser.url);
+					this->request.url = std::move(this->url_parser.url);
 					this->cur_state = state::skip_spaces;
 					this->state_after_skiping_spaces = state::protocol;
 				}

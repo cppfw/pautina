@@ -212,7 +212,7 @@ void parser::handle_end_of_path_segment()
 		return;
 	}
 
-	this->url.path.parts.push_back(utki::make_string(this->buf));
+	this->url.path.push_back(utki::make_string(this->buf));
 	this->buf.clear();
 }
 

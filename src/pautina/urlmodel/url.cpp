@@ -66,8 +66,8 @@ std::string url::to_string() const
 		ss << '/';
 	}
 
-	if (!this->path.parts.empty()) {
-		for (const auto& p : this->path.parts) {
+	if (!this->path.empty()) {
+		for (const auto& p : this->path) {
 			ss << '/' << p;
 		}
 	}
@@ -93,18 +93,20 @@ std::string url::to_string() const
 	return ss.str();
 }
 
-bool path::operator<(const path& p) const noexcept
+bool less::operator()(utki::span<const std::string> a, utki::span<const std::string> b) const noexcept
 {
-	auto i = this->parts.begin();
-	auto j = p.parts.begin();
+	auto i = a.begin();
+	auto j = b.begin();
 
-	for (; i != this->parts.end() && j != p.parts.end(); ++i, ++j) {
-		if (*i < *j) {
-			continue;
+	for (; i != a.end() && j != b.end(); ++i, ++j) {
+		if (!(*i < *j)) {
+			return false;
 		}
-
-		return false;
 	}
 
-	return this->parts.size() < this->parts.size();
+	if (i == a.end()) {
+		return true;
+	}
+
+	return false;
 }

@@ -30,25 +30,17 @@ SOFTWARE.
 #include <string>
 #include <vector>
 
+#include <utki/span.hpp>
+
 namespace urlmodel {
 
-class path
-{
-public:
-	std::vector<std::string> parts;
+struct less {
+	// allow comparing different types (heterogeneous comparison),
+	// for automatic conversion of arguments
+	// from std::vector<std::string> to utki::span<std::string>
+	using is_transparent = int;
 
-	path() = default;
-
-	path(std::initializer_list<std::string> il) :
-		parts{il}
-	{}
-
-	bool operator<(const path& p) const noexcept;
-
-	bool operator==(const path& p) const noexcept
-	{
-		return this->parts == p.parts;
-	}
+	bool operator()(utki::span<const std::string> a, utki::span<const std::string> b) const noexcept;
 };
 
 class url
@@ -62,7 +54,7 @@ public:
 	std::string host;
 	uint16_t port = 0;
 
-	urlmodel::path path;
+	std::vector<std::string> path;
 	std::map<std::string, std::string> query;
 	std::string fragment;
 

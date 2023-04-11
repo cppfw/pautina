@@ -41,7 +41,8 @@ public:
 	httpmodel::protocol protocol;
 	httpmodel::method method;
 
-	urlmodel::url path;
+	// URL in HTTP request has only path, query and fragment parts
+	urlmodel::url url;
 
 	httpmodel::headers headers;
 
