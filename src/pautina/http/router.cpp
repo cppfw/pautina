@@ -46,14 +46,14 @@ bool is_less(const std::vector<std::string>& a, const std::vector<std::string>& 
 } // namespace
 
 router::router(decltype(sorted_routes)&& routes) :
-	sorted_routes(std::move(routes))
-
-{
-	std::sort( //
-		this->sorted_routes.begin(),
-		this->sorted_routes.end(),
-		[](const auto& a, const auto& b) {
-			return is_less(a.path, b.path);
-		}
-	);
-}
+	sorted_routes([routes = std::move(routes)]() mutable {
+		std::sort( //
+			routes.begin(),
+			routes.end(),
+			[](const auto& a, const auto& b) {
+				return is_less(a.path, b.path);
+			}
+		);
+		return std::move(routes);
+	}())
+{}

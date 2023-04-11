@@ -33,7 +33,7 @@ namespace pautina::http {
 class router
 {
 	// routes are sorted by path
-	std::vector<route> sorted_routes;
+	const std::vector<route> sorted_routes;
 
 public:
 	router(decltype(sorted_routes)&& routes);
