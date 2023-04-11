@@ -84,7 +84,7 @@ tst::set set("http__router", [](tst::suite& suite){
                         {"blah"},
                         [&](const auto& req, auto subpath){
                             called = true;
-                            std::cout << "subpath = " << subpath << std::endl;
+                            // std::cout << "subpath = " << subpath << std::endl;
                             the_subpath = utki::make_vector(subpath);
                             return httpmodel::response{
                                 .status = httpmodel::status_code::http_200
