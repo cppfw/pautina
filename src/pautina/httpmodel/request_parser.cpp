@@ -107,6 +107,8 @@ void request_parser::set_state_after_headers()
 
 	auto content_length_header = this->request.headers.get(httpmodel::to_string(httpmodel::header::content_length));
 	if (!content_length_header.has_value()) {
+		// no "Content-Length" header
+
 		// TODO: implement support of "Transfer-Encoding" header and
 		//   "multipart/byteranges" mediatype.
 		//   See section 4.4 of https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html

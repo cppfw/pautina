@@ -55,7 +55,28 @@ std::optional<std::string_view> headers::get(std::string_view name) const noexce
 	return utki::make_string_view(i->second);
 }
 
+std::optional<std::string_view> headers::get(header h) const noexcept
+{
+	return this->get(to_string(h));
+}
+
 void headers::add(std::string&& name, std::string&& value)
 {
 	this->hdrs.insert_or_assign(std::move(name), std::move(value));
+}
+
+void headers::add(header h, std::string&& value)
+{
+	this->add(std::string(to_string(h)), std::move(value));
+}
+
+void headers::append_to(std::vector<uint8_t>& buf) const
+{
+	for (const auto& h : this->hdrs) {
+		std::copy(h.first.begin(), h.first.end(), std::back_inserter(buf));
+		buf.push_back(':');
+		buf.push_back(' ');
+		std::copy(h.second.begin(), h.second.end(), std::back_inserter(buf));
+		buf.push_back('\n');
+	}
 }

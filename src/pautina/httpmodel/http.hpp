@@ -50,7 +50,7 @@ protocol protocol_from_string(std::string_view str);
  * @param p - request protocol to get the string name for.
  * @return String name of the request protocol.
  */
-std::string_view protocol_to_string(protocol p) noexcept;
+std::string_view to_string(protocol p) noexcept;
 
 /**
  * @brief Request method.
@@ -80,75 +80,79 @@ method method_from_string(std::string_view str);
  * @param m - request method to get string name for.
  * @return String name of the request method.
  */
-std::string_view method_to_string(method m) noexcept;
+std::string_view to_string(method m) noexcept;
 
 /**
  * @brief HTTP response status code.
  */
 enum class status_code {
-	http_100, // Continue
-	http_101, // Switching Protocols
-	http_102, // Processing
-	http_103, // Early Hints
-	http_200, // OK
-	http_201, // Created
-	http_202, // Accepted
-	http_203, // Non-Authoritative Information
-	http_204, // No Content
-	http_205, // Reset Content
-	http_206, // Partial Content
-	http_207, // Multi-Status
-	http_208, // Already Reported
-	http_226, // IM Used
-	http_300, // Multiple Choices
-	http_301, // Moved Permanently
-	http_302, // Found
-	http_303, // See Other
-	http_304, // Not Modified
-	http_305, // Use Proxy
-	http_306, // Switch Proxy
-	http_307, // Temporary Redirect
-	http_308, // Permanent Redirect
-	http_400, // Bad Request
-	http_401, // Unauthorized
-	http_402, // Payment Required
-	http_403, // Forbidden
-	http_404, // Not Found
-	http_405, // Method Not Allowed
-	http_406, // Not Acceptable
-	http_407, // Proxy Authentication Required
-	http_408, // Request Timeout
-	http_409, // Conflict
-	http_410, // Gone
-	http_411, // Length Required
-	http_412, // Precondition Failed
-	http_413, // Payload Too Large
-	http_414, // URI Too Long
-	http_415, // Unsupported Media Type
-	http_416, // Range Not Satisfiable
-	http_417, // Expectation Failed
-	http_418, // I'm a teapot
-	http_421, // Misdirected Request
-	http_422, // Unprocessable Entity
-	http_423, // Locked
-	http_424, // Failed Dependency
-	http_425, // Too Early
-	http_426, // Upgrade Required
-	http_428, // Precondition Required
-	http_429, // Too Many Requests
-	http_431, // Request Header Fields Too Large
-	http_451, // Unavailable For Legal Reasons
-	http_500, // Internal Server Error
-	http_501, // Not Implemented
-	http_502, // Bad Gateway
-	http_503, // Service Unavailable
-	http_504, // Gateway Timeout
-	http_505, // HTTP Version Not Supported
-	http_506, // Variant Also Negotiates
-	http_507, // Insufficient Storage
-	http_508, // Loop Detected
-	http_510, // Not Extended
-	http_511 // Network Authentication Required
+	http_100 = 100, // Continue
+	http_101 = 101, // Switching Protocols
+	http_102 = 102, // Processing
+	http_103 = 103, // Early Hints
+	http_200 = 200, // OK
+	http_201 = 201, // Created
+	http_202 = 202, // Accepted
+	http_203 = 203, // Non-Authoritative Information
+	http_204 = 204, // No Content
+	http_205 = 205, // Reset Content
+	http_206 = 206, // Partial Content
+	http_207 = 207, // Multi-Status
+	http_208 = 208, // Already Reported
+	http_226 = 226, // IM Used
+	http_300 = 300, // Multiple Choices
+	http_301 = 301, // Moved Permanently
+	http_302 = 302, // Found
+	http_303 = 303, // See Other
+	http_304 = 304, // Not Modified
+	http_305 = 305, // Use Proxy
+	http_306 = 306, // Switch Proxy
+	http_307 = 307, // Temporary Redirect
+	http_308 = 308, // Permanent Redirect
+	http_400 = 400, // Bad Request
+	http_401 = 401, // Unauthorized
+	http_402 = 402, // Payment Required
+	http_403 = 403, // Forbidden
+	http_404 = 404, // Not Found
+	http_405 = 405, // Method Not Allowed
+	http_406 = 406, // Not Acceptable
+	http_407 = 407, // Proxy Authentication Required
+	http_408 = 408, // Request Timeout
+	http_409 = 409, // Conflict
+	http_410 = 410, // Gone
+	http_411 = 411, // Length Required
+	http_412 = 412, // Precondition Failed
+	http_413 = 413, // Payload Too Large
+	http_414 = 414, // URI Too Long
+	http_415 = 415, // Unsupported Media Type
+	http_416 = 416, // Range Not Satisfiable
+	http_417 = 417, // Expectation Failed
+	http_418 = 418, // I'm a teapot
+	http_421 = 421, // Misdirected Request
+	http_422 = 422, // Unprocessable Entity
+	http_423 = 423, // Locked
+	http_424 = 424, // Failed Dependency
+	http_425 = 425, // Too Early
+	http_426 = 426, // Upgrade Required
+	http_428 = 428, // Precondition Required
+	http_429 = 429, // Too Many Requests
+	http_431 = 431, // Request Header Fields Too Large
+	http_451 = 451, // Unavailable For Legal Reasons
+	http_500 = 500, // Internal Server Error
+	http_501 = 501, // Not Implemented
+	http_502 = 502, // Bad Gateway
+	http_503 = 503, // Service Unavailable
+	http_504 = 504, // Gateway Timeout
+	http_505 = 505, // HTTP Version Not Supported
+	http_506 = 506, // Variant Also Negotiates
+	http_507 = 507, // Insufficient Storage
+	http_508 = 508, // Loop Detected
+	http_510 = 510, // Not Extended
+	http_511 = 511 // Network Authentication Required
 };
+
+std::string to_string(status_code sc);
+
+std::string_view get_status_text(status_code sc);
 
 } // namespace httpmodel

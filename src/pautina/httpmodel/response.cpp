@@ -24,46 +24,43 @@ SOFTWARE.
 
 /* ================ LICENSE END ================ */
 
-#pragma once
+#include "response.hpp"
 
-#include <map>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <vector>
+using namespace httpmodel;
 
-namespace httpmodel {
-
-enum class header {
-	// WARNING: do not change order, add new items to the end of enum
-	host,
-	accept,
-	content_length,
-
-	// TODO: add well known headers
-
-	enum_size
-};
-
-std::string_view to_string(header h);
-
-class headers
+std::vector<uint8_t> response::to_bytes() const
 {
-	std::map<std::string, std::string, std::less<>> hdrs;
+	std::vector<uint8_t> ret;
 
-public:
-	void add(std::string&& name, std::string&& value);
-	void add(header h, std::string&& value);
-
-	std::optional<std::string_view> get(std::string_view name) const noexcept;
-	std::optional<std::string_view> get(header h) const noexcept;
-
-	const decltype(hdrs)& get_map() const noexcept
 	{
-		return this->hdrs;
+		auto p = to_string(this->protocol);
+		std::copy(p.begin(), p.end(), std::back_inserter(ret));
 	}
 
-	void append_to(std::vector<uint8_t>& buf) const;
-};
+	ret.push_back(' ');
 
-} // namespace httpmodel
+	{
+		auto s = to_string(this->status);
+		std::copy(s.begin(), s.end(), std::back_inserter(ret));
+	}
+
+	ret.push_back(' ');
+
+	if (this->status_text.empty()) {
+		// use default status text for given status code
+		auto st = get_status_text(this->status);
+		std::copy(st.begin(), st.end(), std::back_inserter(ret));
+	} else {
+		std::copy(this->status_text.begin(), this->status_text.end(), std::back_inserter(ret));
+	}
+
+	ret.push_back('\n');
+
+	this->headers.append_to(ret);
+
+	ret.push_back('\n');
+
+	std::copy(this->body.begin(), this->body.end(), std::back_inserter(ret));
+
+	return ret;
+}

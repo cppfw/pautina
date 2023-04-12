@@ -45,6 +45,8 @@ public:
 	httpmodel::headers headers;
 
 	std::vector<uint8_t> body;
+
+	std::vector<uint8_t> to_bytes() const;
 };
 
 } // namespace httpmodel
