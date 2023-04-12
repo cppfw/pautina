@@ -96,7 +96,7 @@ std::optional<uint32_t> connection_thread::on_loop()
 
 					auto prev_status = c->status;
 
-					c->handle_received_data(utki::make_span(buf.data(), num_bytes_received));
+					c->handle_data_received(utki::make_span(buf.data(), num_bytes_received));
 
 					// write flag can also change, so compare statuses as a whole
 					if (c->status != prev_status) {
@@ -151,7 +151,7 @@ std::optional<uint32_t> connection_thread::on_loop()
 					auto old_status = c->status;
 
 					c->status.clear(opros::ready::write);
-					c->handle_data_sent();
+					c->handle_all_data_sent();
 
 					if (c->status.get(opros::ready::write)) {
 						ASSERT(c->status.get(opros::ready::write))

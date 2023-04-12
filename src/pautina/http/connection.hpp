@@ -44,9 +44,9 @@ class connection : public pautina::connection
 public:
 	connection(setka::tcp_socket&& socket, const pautina::http::server& owner);
 
-	void handle_received_data(utki::span<const uint8_t> data) override;
+	void handle_data_received(utki::span<const uint8_t> data) override;
 
-	void handle_data_sent() override;
+	void handle_all_data_sent() override;
 };
 
 } // namespace pautina::http

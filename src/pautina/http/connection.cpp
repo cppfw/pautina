@@ -35,7 +35,7 @@ connection::connection(setka::tcp_socket&& socket, const pautina::http::server& 
 	owner(owner)
 {}
 
-void connection::handle_received_data(utki::span<const uint8_t> data)
+void connection::handle_data_received(utki::span<const uint8_t> data)
 {
 	ASSERT(!data.empty())
 
@@ -69,7 +69,7 @@ void connection::handle_received_data(utki::span<const uint8_t> data)
 	// TODO: handle parsed requests
 }
 
-void connection::handle_data_sent()
+void connection::handle_all_data_sent()
 {
 	// TODO: handle requests in queue
 }

@@ -69,13 +69,13 @@ public:
 	 * @return true if ready to handle more data.
 	 * @return true if not ready to handle more data.
 	 */
-	virtual void handle_received_data(utki::span<const uint8_t> data) = 0;
+	virtual void handle_data_received(utki::span<const uint8_t> data) = 0;
 
 	/**
 	 * @return true if ready to receive more data.
 	 * @return true if not ready to receive data.
 	 */
-	virtual void handle_data_sent() = 0;
+	virtual void handle_all_data_sent() = 0;
 
 	/**
 	 * @brief Check if send buffer is empty.
