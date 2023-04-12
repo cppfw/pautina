@@ -46,6 +46,8 @@ public:
 
 	std::vector<uint8_t> body;
 
+	std::vector<uint8_t> to_bytes_no_body() const;
+
 	std::vector<uint8_t> to_bytes() const;
 };
 

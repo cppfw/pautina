@@ -28,7 +28,7 @@ SOFTWARE.
 
 using namespace httpmodel;
 
-std::vector<uint8_t> response::to_bytes() const
+std::vector<uint8_t> response::to_bytes_no_body() const
 {
 	std::vector<uint8_t> ret;
 
@@ -59,6 +59,13 @@ std::vector<uint8_t> response::to_bytes() const
 	this->headers.append_to(ret);
 
 	ret.push_back('\n');
+
+	return ret;
+}
+
+std::vector<uint8_t> response::to_bytes() const
+{
+	std::vector<uint8_t> ret = this->to_bytes_no_body();
 
 	std::copy(this->body.begin(), this->body.end(), std::back_inserter(ret));
 
