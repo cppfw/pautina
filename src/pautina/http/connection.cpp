@@ -35,9 +35,24 @@ connection::connection(setka::tcp_socket&& socket, const pautina::http::server& 
 	owner(owner)
 {}
 
+httpmodel::response connection::handle_request(const httpmodel::request& req)
+{
+	if (req.protocol >= httpmodel::protocol::http_1_1) {
+		if (!req.headers.get(httpmodel::to_string(httpmodel::header::host))) {
+			// HTTP/1.1+ request protocol requires 'Host' header, which is missing
+			return httpmodel::response(req, httpmodel::status::http_400_bad_request);
+		}
+	}
+
+	return this->owner.router.route(req);
+}
+
 void connection::handle_front_request()
 {
-	auto resp = this->owner.router.route(this->requests.front().request);
+	ASSERT(!this->requests.empty())
+	ASSERT(this->requests.front().is_end())
+
+	auto resp = this->handle_request(this->requests.front().request);
 	this->requests.pop_front();
 
 	// send the response

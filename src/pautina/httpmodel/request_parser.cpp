@@ -125,17 +125,6 @@ void request_parser::set_state_after_headers()
 	this->cur_state = state::body;
 }
 
-void request_parser::check_required_headers()
-{
-	if (this->request.protocol >= httpmodel::protocol::http_1_1) {
-		if (!this->request.headers.get(httpmodel::to_string(httpmodel::header::host))) {
-			std::stringstream ss;
-			ss << "HTTP/1.1+ request protocol requires 'Host' header, which is missing";
-			throw std::invalid_argument(ss.str());
-		}
-	}
-}
-
 utki::span<const uint8_t> request_parser::feed(utki::span<const uint8_t> data)
 {
 	while (!data.empty()) {
@@ -168,7 +157,6 @@ utki::span<const uint8_t> request_parser::feed(utki::span<const uint8_t> data)
 				data = this->headers_parser.feed(data);
 				if (this->headers_parser.is_end()) {
 					this->request.headers = std::move(this->headers_parser.headers);
-					this->check_required_headers();
 					this->set_state_after_headers();
 				} else {
 					ASSERT(data.empty())

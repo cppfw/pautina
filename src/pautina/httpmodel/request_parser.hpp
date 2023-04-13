@@ -65,8 +65,6 @@ class request_parser
 
 	urlmodel::parser url_parser;
 
-	void check_required_headers();
-
 	void set_state_after_headers();
 
 	size_t num_body_bytes_expected; // holds number of body bytes remain to read when in state::body
