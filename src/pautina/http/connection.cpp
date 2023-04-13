@@ -94,9 +94,8 @@ void connection::handle_data_received(utki::span<const uint8_t> data)
 				o << "std::invalid_argument while parsing http request: " << e.what() << "\n";
 				o << "data = " << utki::make_string(data) << std::endl;
 			})
-			this->set_can_receive_data(false);
-			// TODO: bad request
-			break;
+			this->disconnect();
+			return;
 		}
 
 		if (this->requests.back().is_end()) {

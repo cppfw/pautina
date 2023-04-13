@@ -107,7 +107,7 @@ std::optional<uint32_t> connection_thread::on_loop()
 				}
 				if (first_read) {
 					// zero bytes received right after the object has become ready to read,
-					// this means that the connection was reset by peer
+					// this means that the connection is disconnected
 					LOG([](auto& o) {
 						o << "connection reset by peer, quit thread!" << std::endl;
 					})
@@ -144,6 +144,8 @@ std::optional<uint32_t> connection_thread::on_loop()
 				size_t num_bytes_sent = c->socket.send(span);
 
 				ASSERT(num_bytes_sent <= span.size())
+
+				// TODO: if(num_bytes_sent == 0) and first try, disconnected???
 
 				if (num_bytes_sent == span.size()) {
 					c->sending_queue.pop_front();
