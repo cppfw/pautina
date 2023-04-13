@@ -45,6 +45,8 @@ class connection : public pautina::connection
 
 	httpmodel::response handle_request(const httpmodel::request& req);
 
+	bool keep_alive = false;
+
 public:
 	connection(setka::tcp_socket&& socket, const pautina::http::server& owner);
 

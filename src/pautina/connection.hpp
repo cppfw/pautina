@@ -96,6 +96,11 @@ public:
 	 */
 	// TODO: should be thread-safe?
 	void send(std::vector<uint8_t>&& data);
+
+	/**
+	 * @brief Disconnect the connection.
+	 */
+	void disconnect();
 };
 
 } // namespace pautina

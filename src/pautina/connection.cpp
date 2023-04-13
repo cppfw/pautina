@@ -47,3 +47,8 @@ void connection::set_can_receive_data(bool can_receive)
 {
 	this->status.set(opros::ready::read, can_receive);
 }
+
+void connection::disconnect()
+{
+	this->socket.disconnect();
+}
