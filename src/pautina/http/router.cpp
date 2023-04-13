@@ -52,5 +52,5 @@ httpmodel::response router::route(const httpmodel::request& req) const
 		path = path.subspan(0, path.size() - 1);
 	}
 
-	return {.status = httpmodel::status_code::http_404};
+	return httpmodel::response(req, httpmodel::status::http_404);
 }

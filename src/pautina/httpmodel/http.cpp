@@ -99,139 +99,139 @@ std::string_view httpmodel::to_string(method m) noexcept
 	return i->second;
 }
 
-std::string httpmodel::to_string(status_code sc)
+std::string httpmodel::to_string(status sc)
 {
 	return std::to_string(unsigned(sc));
 }
 
-std::string_view httpmodel::get_status_text(status_code sc)
+std::string_view httpmodel::get_status_text(status sc)
 {
 	switch (sc) {
-		case status_code::http_100:
+		case status::http_100:
 			return "Continue"sv;
-		case status_code::http_101:
+		case status::http_101:
 			return "Switching Protocols"sv;
-		case status_code::http_102:
+		case status::http_102:
 			return "Processing"sv;
-		case status_code::http_103:
+		case status::http_103:
 			return "Early Hints"sv;
-		case status_code::http_200:
+		case status::http_200:
 			return "OK"sv;
-		case status_code::http_201:
+		case status::http_201:
 			return "Created"sv;
-		case status_code::http_202:
+		case status::http_202:
 			return "Accepted"sv;
-		case status_code::http_203:
+		case status::http_203:
 			return "Non-Authoritative Information"sv;
-		case status_code::http_204:
+		case status::http_204:
 			return "No Content"sv;
-		case status_code::http_205:
+		case status::http_205:
 			return "Reset Content"sv;
-		case status_code::http_206:
+		case status::http_206:
 			return "Partial Content"sv;
-		case status_code::http_207:
+		case status::http_207:
 			return "Multi-Status"sv;
-		case status_code::http_208:
+		case status::http_208:
 			return "Already Reported"sv;
-		case status_code::http_226:
+		case status::http_226:
 			return "IM Used"sv;
-		case status_code::http_300:
+		case status::http_300:
 			return "Multiple Choices"sv;
-		case status_code::http_301:
+		case status::http_301:
 			return "Moved Permanently"sv;
-		case status_code::http_302:
+		case status::http_302:
 			return "Found"sv;
-		case status_code::http_303:
+		case status::http_303:
 			return "See Other"sv;
-		case status_code::http_304:
+		case status::http_304:
 			return "Not Modified"sv;
-		case status_code::http_305:
+		case status::http_305:
 			return "Use Proxy"sv;
-		case status_code::http_306:
+		case status::http_306:
 			return "Switch Proxy"sv;
-		case status_code::http_307:
+		case status::http_307:
 			return "Temporary Redirect"sv;
-		case status_code::http_308:
+		case status::http_308:
 			return "Permanent Redirect"sv;
-		case status_code::http_400:
+		case status::http_400:
 			return "Bad Request"sv;
-		case status_code::http_401:
+		case status::http_401:
 			return "Unauthorized"sv;
-		case status_code::http_402:
+		case status::http_402:
 			return "Payment Required"sv;
-		case status_code::http_403:
+		case status::http_403:
 			return "Forbidden"sv;
-		case status_code::http_404:
+		case status::http_404:
 			return "Not Found"sv;
-		case status_code::http_405:
+		case status::http_405:
 			return "Method Not Allowed"sv;
-		case status_code::http_406:
+		case status::http_406:
 			return "Not Acceptable"sv;
-		case status_code::http_407:
+		case status::http_407:
 			return "Proxy Authentication Required"sv;
-		case status_code::http_408:
+		case status::http_408:
 			return "Request Timeout"sv;
-		case status_code::http_409:
+		case status::http_409:
 			return "Conflict"sv;
-		case status_code::http_410:
+		case status::http_410:
 			return "Gone"sv;
-		case status_code::http_411:
+		case status::http_411:
 			return "Length Required"sv;
-		case status_code::http_412:
+		case status::http_412:
 			return "Precondition Failed"sv;
-		case status_code::http_413:
+		case status::http_413:
 			return "Payload Too Large"sv;
-		case status_code::http_414:
+		case status::http_414:
 			return "URI Too Long"sv;
-		case status_code::http_415:
+		case status::http_415:
 			return "Unsupported Media Type"sv;
-		case status_code::http_416:
+		case status::http_416:
 			return "Range Not Satisfiable"sv;
-		case status_code::http_417:
+		case status::http_417:
 			return "Expectation Failed"sv;
-		case status_code::http_418:
+		case status::http_418:
 			return "I'm a teapot"sv;
-		case status_code::http_421:
+		case status::http_421:
 			return "Misdirected Request"sv;
-		case status_code::http_422:
+		case status::http_422:
 			return "Unprocessable Entity"sv;
-		case status_code::http_423:
+		case status::http_423:
 			return "Locked"sv;
-		case status_code::http_424:
+		case status::http_424:
 			return "Failed Dependency"sv;
-		case status_code::http_425:
+		case status::http_425:
 			return "Too Early"sv;
-		case status_code::http_426:
+		case status::http_426:
 			return "Upgrade Required"sv;
-		case status_code::http_428:
+		case status::http_428:
 			return "Precondition Required"sv;
-		case status_code::http_429:
+		case status::http_429:
 			return "Too Many Requests"sv;
-		case status_code::http_431:
+		case status::http_431:
 			return "Request Header Fields Too Large"sv;
-		case status_code::http_451:
+		case status::http_451:
 			return "Unavailable For Legal Reasons"sv;
-		case status_code::http_500:
+		case status::http_500:
 			return "Internal Server Error"sv;
-		case status_code::http_501:
+		case status::http_501:
 			return "Not Implemented"sv;
-		case status_code::http_502:
+		case status::http_502:
 			return "Bad Gateway"sv;
-		case status_code::http_503:
+		case status::http_503:
 			return "Service Unavailable"sv;
-		case status_code::http_504:
+		case status::http_504:
 			return "Gateway Timeout"sv;
-		case status_code::http_505:
+		case status::http_505:
 			return "HTTP Version Not Supported"sv;
-		case status_code::http_506:
+		case status::http_506:
 			return "Variant Also Negotiates"sv;
-		case status_code::http_507:
+		case status::http_507:
 			return "Insufficient Storage"sv;
-		case status_code::http_508:
+		case status::http_508:
 			return "Loop Detected"sv;
-		case status_code::http_510:
+		case status::http_510:
 			return "Not Extended"sv;
-		case status_code::http_511:
+		case status::http_511:
 			return "Authentication Required"sv;
 	}
 

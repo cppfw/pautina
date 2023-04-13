@@ -22,7 +22,7 @@ tst::set set("http__router", [](tst::suite& suite){
                 }
             });
 
-            tst::check(resp.status == httpmodel::status_code::http_404, SL);
+            tst::check(resp.status == httpmodel::status::http_404, SL);
         }
     );
 
@@ -46,9 +46,7 @@ tst::set set("http__router", [](tst::suite& suite){
                         [&](const auto& req, auto subpath){
                             called = true;
                             the_subpath = utki::make_vector(subpath);
-                            return httpmodel::response{
-                                .status = httpmodel::status_code::http_200
-                            };
+                            return httpmodel::response(req, httpmodel::status::http_200);
                         }
                     }
                 }
@@ -62,7 +60,7 @@ tst::set set("http__router", [](tst::suite& suite){
 
             tst::check(called, SL);
             tst::check(the_subpath == p, SL);
-            tst::check(resp.status == httpmodel::status_code::http_200, SL);
+            tst::check(resp.status == httpmodel::status::http_200, SL);
         }
     );
 
@@ -86,9 +84,7 @@ tst::set set("http__router", [](tst::suite& suite){
                             called = true;
                             // std::cout << "subpath = " << subpath << std::endl;
                             the_subpath = utki::make_vector(subpath);
-                            return httpmodel::response{
-                                .status = httpmodel::status_code::http_200
-                            };
+                            return httpmodel::response(req, httpmodel::status::http_200);
                         }
                     }
                 }
@@ -102,7 +98,7 @@ tst::set set("http__router", [](tst::suite& suite){
 
             tst::check(called, SL);
             tst::check_eq(utki::make_span(const_cast<const decltype(the_subpath)&>(the_subpath)), utki::make_span(p).subspan(1), SL);
-            tst::check(resp.status == httpmodel::status_code::http_200, SL);
+            tst::check(resp.status == httpmodel::status::http_200, SL);
         }
     );
 });

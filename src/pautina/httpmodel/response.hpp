@@ -30,15 +30,22 @@ SOFTWARE.
 
 #include "headers.hpp"
 #include "http.hpp"
+#include "request.hpp"
 
 namespace httpmodel {
 
 class response
 {
 public:
+	explicit response() = default;
+
+	response(const httpmodel::request& request);
+
+	response(const httpmodel::request& request, httpmodel::status status);
+
 	httpmodel::protocol protocol;
 
-	status_code status;
+	httpmodel::status status;
 
 	std::string status_text;
 

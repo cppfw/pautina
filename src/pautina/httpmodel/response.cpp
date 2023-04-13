@@ -28,6 +28,15 @@ SOFTWARE.
 
 using namespace httpmodel;
 
+response::response(const httpmodel::request& request) :
+	protocol(request.protocol)
+{}
+
+response::response(const httpmodel::request& request, httpmodel::status status) :
+	protocol(request.protocol),
+	status(status)
+{}
+
 std::vector<uint8_t> response::to_bytes_no_body() const
 {
 	std::vector<uint8_t> ret;

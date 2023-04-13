@@ -85,7 +85,7 @@ std::string_view to_string(method m) noexcept;
 /**
  * @brief HTTP response status code.
  */
-enum class status_code {
+enum class status {
 	http_100 = 100, // Continue
 	http_101 = 101, // Switching Protocols
 	http_102 = 102, // Processing
@@ -151,8 +151,8 @@ enum class status_code {
 	http_511 = 511 // Network Authentication Required
 };
 
-std::string to_string(status_code sc);
+std::string to_string(status s);
 
-std::string_view get_status_text(status_code sc);
+std::string_view get_status_text(status s);
 
 } // namespace httpmodel
