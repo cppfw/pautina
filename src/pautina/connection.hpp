@@ -26,6 +26,8 @@ SOFTWARE.
 
 #pragma once
 
+#include <deque>
+
 #include <setka/tcp_socket.hpp>
 #include <utki/flags.hpp>
 #include <utki/span.hpp>
@@ -53,8 +55,8 @@ private:
 	utki::flags<opros::ready> status{opros::ready::read};
 
 	// stuff used in 'sending' state
-	std::vector<uint8_t> data_to_send;
-	size_t num_bytes_sent;
+	std::deque<std::vector<uint8_t>> sending_queue;
+	size_t num_bytes_sent; // for front element of the seinding queue
 
 protected:
 	/**
@@ -91,11 +93,9 @@ public:
 	/**
 	 * @brief Send data over the connection.
 	 * @param data - data to send.
-	 * @return Empty vector in case the data has been accepted for sending.
-	 * @return Passed in vector in case send buffer is full.
 	 */
 	// TODO: should be thread-safe?
-	std::vector<uint8_t> send(std::vector<uint8_t>&& data);
+	void send(std::vector<uint8_t>&& data);
 };
 
 } // namespace pautina

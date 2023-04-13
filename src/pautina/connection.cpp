@@ -32,18 +32,15 @@ connection::connection(setka::tcp_socket&& socket) :
 	socket(std::move(socket))
 {}
 
-std::vector<uint8_t> connection::send(std::vector<uint8_t>&& data)
+void connection::send(std::vector<uint8_t>&& data)
 {
-	if (!this->data_to_send.empty() || data.empty()) {
-		return data;
+	if (this->sending_queue.empty()) {
+		this->num_bytes_sent = 0;
 	}
 
-	this->data_to_send = std::move(data);
-	this->num_bytes_sent = 0;
+	this->sending_queue.push_back(std::move(data));
 
 	this->status.set(opros::ready::write);
-
-	return {};
 }
 
 void connection::set_can_receive_data(bool can_receive)
