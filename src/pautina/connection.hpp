@@ -80,14 +80,14 @@ public:
 	virtual void handle_all_data_sent() = 0;
 
 	/**
-	 * @brief Check if send buffer is empty.
+	 * @brief Check if send buffer is not empty.
 	 * Not thread-safe.
-	 * @return true if send buffer is free and data can be sent over the connection.
+	 * @return true if send buffer is not empty, i.e. some data is in process of being sent.
 	 * @return false otherwise.
 	 */
-	bool can_send() const noexcept
+	bool is_sending() const noexcept
 	{
-		return !this->status.get(opros::ready::write);
+		return this->status.get(opros::ready::write);
 	}
 
 	/**

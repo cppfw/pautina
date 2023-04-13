@@ -35,6 +35,27 @@ connection::connection(setka::tcp_socket&& socket, const pautina::http::server& 
 	owner(owner)
 {}
 
+void connection::handle_front_request()
+{
+	auto resp = this->owner.router.route(this->requests.front().request);
+	this->requests.pop_front();
+
+	// send the response
+	LOG([&](auto& o) {
+		o << "sending http response, status = " << to_string(resp.status) << std::endl;
+	})
+	this->send(resp.to_bytes_no_body());
+	if (!resp.body.empty()) {
+		this->send(std::move(resp.body));
+	}
+
+	// if not all requests have been handled wait with receiving more data
+	if (!this->requests.empty() && this->requests.front().is_end()) {
+		ASSERT(this->is_sending())
+		this->set_can_receive_data(false);
+	}
+}
+
 void connection::handle_data_received(utki::span<const uint8_t> data)
 {
 	ASSERT(!data.empty())
@@ -49,9 +70,7 @@ void connection::handle_data_received(utki::span<const uint8_t> data)
 
 	while (!data.empty()) {
 		ASSERT(!this->requests.empty())
-		if (this->requests.back().is_end()) {
-			this->requests.emplace_back();
-		}
+		ASSERT(!this->requests.back().is_end())
 
 		try {
 			data = this->requests.back().feed(data);
@@ -64,12 +83,38 @@ void connection::handle_data_received(utki::span<const uint8_t> data)
 			// TODO: bad request
 			break;
 		}
+
+		if (this->requests.back().is_end()) {
+			LOG([&](auto& o) {
+				o << "http request parsed" << std::endl;
+			})
+			this->requests.emplace_back();
+		}
 	}
 
-	// TODO: handle parsed requests
+	ASSERT(!this->requests.empty())
+
+	// handle parsed requests
+	if (this->requests.front().is_end()) {
+		if (!this->is_sending()) {
+			// handling request will send the response, so we only want to
+			// send something unless there is no sending in progress
+			this->handle_front_request();
+		}
+	}
 }
 
 void connection::handle_all_data_sent()
 {
-	// TODO: handle requests in queue
+	ASSERT(!this->is_sending())
+
+	// handle requests in queue
+	if (this->requests.empty() || !this->requests.front().is_end()) {
+		this->set_can_receive_data(true);
+	} else {
+		ASSERT(!this->requests.empty())
+		ASSERT(this->requests.front().is_end())
+
+		this->handle_front_request();
+	}
 }

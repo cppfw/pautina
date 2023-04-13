@@ -46,7 +46,7 @@ utki::span<const uint8_t> headers_parser::parse_name(utki::span<const uint8_t> d
 			this->state_after_skiping_spaces = state::value;
 			++i;
 			break;
-		} else if (c == '\n' && this->buf.empty()) {
+		} else if (c == '\n' && (this->buf.empty() || (this->buf.size() == 1 && this->buf[0] == '\r'))) {
 			// end of HTTP request header
 			this->cur_state = state::end;
 			++i;
@@ -66,6 +66,9 @@ utki::span<const uint8_t> headers_parser::parse_value(utki::span<const uint8_t> 
 		auto c = char(*i);
 
 		if (c == '\n') {
+			if (!this->buf.empty() && this->buf.back() == '\r') {
+				this->buf.pop_back();
+			}
 			this->headers.add(std::move(this->header_name), utki::make_string(this->buf));
 			this->buf.clear();
 			this->cur_state = state::name;

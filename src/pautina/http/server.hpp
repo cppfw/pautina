@@ -35,6 +35,8 @@ namespace pautina::http {
 
 class server : public pautina::server
 {
+	friend class connection;
+
 	pautina::http::router router;
 
 public:
@@ -42,7 +44,7 @@ public:
 
 	server(const configuration& config, router::routes_type&& routes);
 
-	std::unique_ptr<connection> spawn_connection(setka::tcp_socket&& socket) const override;
+	std::unique_ptr<pautina::connection> spawn_connection(setka::tcp_socket&& socket) const override;
 };
 
 } // namespace pautina::http

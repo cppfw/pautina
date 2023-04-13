@@ -41,6 +41,8 @@ class connection : public pautina::connection
 
 	const pautina::http::server& owner;
 
+	void handle_front_request();
+
 public:
 	connection(setka::tcp_socket&& socket, const pautina::http::server& owner);
 
