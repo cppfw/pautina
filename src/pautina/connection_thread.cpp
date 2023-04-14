@@ -43,12 +43,11 @@ connection_thread::~connection_thread()
 	})
 }
 
-void connection_thread::push(std::unique_ptr<pautina::connection> conn)
+void connection_thread::push(const utki::shared_ref<pautina::connection>& conn)
 {
-	// TODO: use shared_ref?
-	this->push_back([this, c = conn.release()]() mutable {
+	this->push_back([this, c = conn]() mutable {
 		ASSERT(!this->connection)
-		this->connection.reset(c);
+		this->connection = c.to_shared_ptr();
 
 		this->wait_set.add(
 			this->connection->socket,

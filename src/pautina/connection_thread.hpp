@@ -32,6 +32,7 @@ SOFTWARE.
 #include <nitki/queue.hpp>
 #include <opros/wait_set.hpp>
 #include <setka/tcp_socket.hpp>
+#include <utki/shared_ref.hpp>
 
 #include "connection.hpp"
 
@@ -47,7 +48,7 @@ class connection_thread : public nitki::loop_thread
 	std::list<connection_thread>::iterator owner_iter;
 
 	// TODO: handle several connections
-	std::unique_ptr<pautina::connection> connection;
+	std::shared_ptr<pautina::connection> connection;
 
 public:
 	connection_thread(server& owner);
@@ -55,7 +56,7 @@ public:
 
 	std::optional<uint32_t> on_loop() override;
 
-	void push(std::unique_ptr<pautina::connection> conn);
+	void push(const utki::shared_ref<pautina::connection>& conn);
 };
 
 } // namespace pautina

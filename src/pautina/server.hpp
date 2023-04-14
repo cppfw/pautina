@@ -58,7 +58,7 @@ public:
 	server(const configuration& config);
 	~server() override;
 
-	virtual std::unique_ptr<connection> spawn_connection(setka::tcp_socket&& socket) const = 0;
+	virtual utki::shared_ref<connection> spawn_connection(setka::tcp_socket&& socket) const = 0;
 };
 
 } // namespace pautina
