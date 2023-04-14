@@ -11,7 +11,7 @@ this_u_pautina_lib := ../../src/out/$(c)/libpautina.so
 
 this_cxxflags += -I ../../src
 
-this_ldlibs += -ltst -lutki -lurlmodel $(this_u_pautina_lib)
+this_ldlibs += -ltst -lutki -lurlmodel -lhttpmodel $(this_u_pautina_lib)
 
 $(eval $(prorab-build-app))
 

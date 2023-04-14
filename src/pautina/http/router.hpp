@@ -29,10 +29,9 @@ SOFTWARE.
 #include <functional>
 #include <map>
 
+#include <httpmodel/request.hpp>
+#include <httpmodel/response.hpp>
 #include <utki/span.hpp>
-
-#include "../httpmodel/request.hpp"
-#include "../httpmodel/response.hpp"
 
 namespace pautina::http {
 

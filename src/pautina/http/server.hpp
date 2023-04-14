@@ -26,7 +26,8 @@ SOFTWARE.
 
 #pragma once
 
-#include "../httpmodel/response.hpp"
+#include <httpmodel/response.hpp>
+
 #include "../server.hpp"
 
 #include "router.hpp"
