@@ -10,7 +10,7 @@ tst::set set("urlmodel__url", [](tst::suite& suite){
         std::vector<std::string>
     >>
     (
-        "less__true",
+        "path_less__true",
         {
             {
                 {},
@@ -34,7 +34,7 @@ tst::set set("urlmodel__url", [](tst::suite& suite){
             }
         },
         [](const auto& p){
-            tst::check(urlmodel::less()(p.first, p.second), SL) << "\n"
+            tst::check(urlmodel::path_less()(p.first, p.second), SL) << "\n"
                 << "a = " << utki::make_span(p.first) << "\n"
                 << "b = " << utki::make_span(p.second) << "\n";
         }
@@ -45,7 +45,7 @@ tst::set set("urlmodel__url", [](tst::suite& suite){
         std::vector<std::string>
     >>
     (
-        "less__false",
+        "path_less__false",
         {
             {
                 {},
@@ -77,7 +77,7 @@ tst::set set("urlmodel__url", [](tst::suite& suite){
             }
         },
         [](const auto& p){
-            tst::check(!urlmodel::less()(p.first, p.second), SL) << "\n"
+            tst::check(!urlmodel::path_less()(p.first, p.second), SL) << "\n"
                 << "a = " << utki::make_span(p.first) << "\n"
                 << "b = " << utki::make_span(p.second) << "\n";
         }

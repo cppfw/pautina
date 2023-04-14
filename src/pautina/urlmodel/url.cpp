@@ -93,7 +93,7 @@ std::string url::to_string() const
 	return ss.str();
 }
 
-bool less::operator()(utki::span<const std::string> a, utki::span<const std::string> b) const noexcept
+bool path_less::operator()(utki::span<const std::string> a, utki::span<const std::string> b) const noexcept
 {
 	auto i = a.begin();
 	auto j = b.begin();

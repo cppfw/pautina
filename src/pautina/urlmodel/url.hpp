@@ -34,7 +34,7 @@ SOFTWARE.
 
 namespace urlmodel {
 
-struct less {
+struct path_less {
 	// allow comparing different types (heterogeneous comparison),
 	// for automatic conversion of arguments
 	// from std::vector<std::string> to utki::span<std::string>
