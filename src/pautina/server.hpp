@@ -30,6 +30,7 @@ SOFTWARE.
 #include <string>
 
 #include <nitki/loop_thread.hpp>
+#include <setka/init_guard.hpp>
 #include <setka/tcp_server_socket.hpp>
 
 #include "connection_thread.hpp"
@@ -39,6 +40,8 @@ namespace pautina {
 class server : public nitki::loop_thread
 {
 	friend class connection_thread;
+
+	std::shared_ptr<utki::destructable> setka_init_guard = setka::get_init_guard_reference();
 
 	setka::tcp_server_socket accept_socket;
 
