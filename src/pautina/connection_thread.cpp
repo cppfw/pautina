@@ -108,7 +108,7 @@ std::optional<uint32_t> connection_thread::on_loop()
 					// zero bytes received right after the object has become ready to read,
 					// this means that the connection is disconnected
 					LOG([](auto& o) {
-						o << "connection reset by peer, quit thread!" << std::endl;
+						o << "disconnected (receive), quit thread!" << std::endl;
 					})
 					// destroy thread
 					this->owner.reclaim_thread(*this);
@@ -126,6 +126,7 @@ std::optional<uint32_t> connection_thread::on_loop()
 		ASSERT(!(!c->status.get(opros::ready::write) && t.flags.get(opros::ready::write)))
 
 		if (t.flags.get(opros::ready::write)) {
+			bool is_first_send = true;
 			while (true) {
 				// if we were waiting on socket for writing, then connection is ready to write as well
 				ASSERT(c->status.get(opros::ready::write))
@@ -144,7 +145,17 @@ std::optional<uint32_t> connection_thread::on_loop()
 
 				ASSERT(num_bytes_sent <= span.size())
 
-				// TODO: if(num_bytes_sent == 0) and first try, disconnected???
+				if (num_bytes_sent == 0 && is_first_send) {
+					// disconnected
+					LOG([](auto& o) {
+						o << "disconnected (send), quit thread!" << std::endl;
+					})
+					// destroy thread
+					this->owner.reclaim_thread(*this);
+					return {};
+				}
+
+				is_first_send = false;
 
 				if (num_bytes_sent == span.size()) {
 					c->sending_queue.pop_front();
