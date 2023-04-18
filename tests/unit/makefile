@@ -7,7 +7,7 @@ this_name := tests
 
 this_srcs := $(call prorab-src-dir, src)
 
-this_u_pautina_lib := ../../src/out/$(c)/libpautina.so
+this_u_pautina_lib := ../../src/out/$(c)/libpautina$(dot_so)
 
 this_cxxflags += -I ../../src
 
