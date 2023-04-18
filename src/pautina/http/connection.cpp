@@ -44,7 +44,7 @@ connection::connection(setka::tcp_socket&& socket, const pautina::http::server& 
 
 httpmodel::response connection::handle_request(const httpmodel::request& req)
 {
-	auto connection_header = req.headers.get(httpmodel::to_string(httpmodel::header::connection));
+	auto connection_header = req.headers.get(httpmodel::header::connection);
 
 	if (req.protocol == httpmodel::protocol::http_1_0) {
 		// check if connection is persistent
@@ -57,7 +57,7 @@ httpmodel::response connection::handle_request(const httpmodel::request& req)
 	} else {
 		ASSERT(req.protocol >= httpmodel::protocol::http_1_1)
 
-		if (!req.headers.get(httpmodel::to_string(httpmodel::header::host))) {
+		if (!req.headers.get(httpmodel::header::host)) {
 			// HTTP/1.1+ request protocol requires 'Host' header, which is missing
 			return {req, httpmodel::status::http_400_bad_request};
 		}
