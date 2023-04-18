@@ -1,0 +1,9 @@
+Name: pautina   # human-readable name
+Description: HTTP service C++ library # human-readable description
+Version: $(version)
+URL: https://github.com/cppfw/pautina
+Requires:
+Conflicts:
+Libs: -lpautina
+Libs.private:
+Cflags:
