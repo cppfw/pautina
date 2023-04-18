@@ -64,7 +64,7 @@ httpmodel::response connection::handle_request(const httpmodel::request& req)
 
 		// check if connection is persistent
 		// Persistent connection spec: https://datatracker.ietf.org/doc/html/rfc7230#section-6.3
-		if (!connection_header.has_value() || connection_header.value() == close_header_value) {
+		if (connection_header.has_value() && connection_header.value() == close_header_value) {
 			this->keep_alive = false;
 		} else {
 			this->keep_alive = true;

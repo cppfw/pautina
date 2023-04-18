@@ -50,5 +50,8 @@ void connection::set_can_receive_data(bool can_receive)
 
 void connection::disconnect()
 {
+	LOG([](auto&o){
+		o << "DISCONNECT" << std::endl;
+	})
 	this->socket.disconnect();
 }
