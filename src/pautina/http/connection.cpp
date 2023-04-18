@@ -59,7 +59,7 @@ httpmodel::response connection::handle_request(const httpmodel::request& req)
 
 		if (!req.headers.get(httpmodel::to_string(httpmodel::header::host))) {
 			// HTTP/1.1+ request protocol requires 'Host' header, which is missing
-			return httpmodel::response(req, httpmodel::status::http_400_bad_request);
+			return {req, httpmodel::status::http_400_bad_request};
 		}
 
 		// check if connection is persistent
