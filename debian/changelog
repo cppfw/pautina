@@ -1,17 +1,5 @@
-libhttpmodel (0.1.2) unstable; urgency=medium
-
-  * add Connection header
-
- -- Ivan Gagis <igagis@gmail.com>  Tue, 18 Apr 2023 11:19:14 +0300
-
-libhttpmodel (0.1.1) unstable; urgency=medium
-
-  * initial release
-
- -- Ivan Gagis <igagis@gmail.com>  Fri, 14 Apr 2023 16:31:42 +0300
-
-libhttpmodel (0.1.0) unstable; urgency=low
+libpautina (0.1.0) unstable; urgency=low
 
   * Initial release
 
- -- Ivan Gagis <igagis@gmail.com>  Fri, 14 Apr 2023 15:36:00 +0200
+ -- Ivan Gagis <igagis@gmail.com>  Tue, 18 Apr 2023 14:22:00 +0200
