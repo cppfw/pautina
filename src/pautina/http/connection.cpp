@@ -30,6 +30,13 @@ SOFTWARE.
 
 using namespace pautina::http;
 
+using namespace std::string_literals;
+
+namespace {
+const std::string keep_alive_header_value = "keep-alive"s;
+const std::string close_header_value = "close"s;
+} // namespace
+
 connection::connection(setka::tcp_socket&& socket, const pautina::http::server& owner) :
 	pautina::connection(std::move(socket)),
 	owner(owner)
@@ -37,10 +44,30 @@ connection::connection(setka::tcp_socket&& socket, const pautina::http::server& 
 
 httpmodel::response connection::handle_request(const httpmodel::request& req)
 {
-	if (req.protocol >= httpmodel::protocol::http_1_1) {
+	auto connection_header = req.headers.get(httpmodel::to_string(httpmodel::header::connection));
+
+	if (req.protocol == httpmodel::protocol::http_1_0) {
+		// check if connection is persistent
+		// Persistent connection spec: https://datatracker.ietf.org/doc/html/rfc7230#section-6.3
+		if (connection_header.has_value() && connection_header.value() == keep_alive_header_value) {
+			this->keep_alive = true;
+		} else {
+			this->keep_alive = false;
+		}
+	} else {
+		ASSERT(req.protocol >= httpmodel::protocol::http_1_1)
+
 		if (!req.headers.get(httpmodel::to_string(httpmodel::header::host))) {
 			// HTTP/1.1+ request protocol requires 'Host' header, which is missing
 			return httpmodel::response(req, httpmodel::status::http_400_bad_request);
+		}
+
+		// check if connection is persistent
+		// Persistent connection spec: https://datatracker.ietf.org/doc/html/rfc7230#section-6.3
+		if (!connection_header.has_value() || connection_header.value() == close_header_value) {
+			this->keep_alive = false;
+		} else {
+			this->keep_alive = true;
 		}
 	}
 
@@ -54,6 +81,22 @@ void connection::handle_front_request()
 
 	auto resp = this->handle_request(this->requests.front().request);
 	this->requests.pop_front();
+
+	// Handle persistent connection.
+	// In case client requested persistent connection, the server must append "Connection" header.
+	// Persistent connection spec: https://datatracker.ietf.org/doc/html/rfc7230#section-6.3
+	if (resp.protocol == httpmodel::protocol::http_1_0) {
+		if (this->keep_alive) {
+			// append "Connection" header, replacing existing one
+			resp.headers.add(httpmodel::header::connection, std::string(keep_alive_header_value));
+		}
+	} else {
+		ASSERT(resp.protocol >= httpmodel::protocol::http_1_1)
+		if (!this->keep_alive) {
+			// append "Connection" header, replacing existing one
+			resp.headers.add(httpmodel::header::connection, std::string(close_header_value));
+		}
+	}
 
 	// send the response
 	LOG([&](auto& o) {
@@ -121,6 +164,12 @@ void connection::handle_data_received(utki::span<const uint8_t> data)
 void connection::handle_all_data_sent()
 {
 	ASSERT(!this->is_sending())
+
+	// If the connection is not persistent, then close it after response has been sent.
+	if (!this->keep_alive) {
+		this->disconnect();
+		return;
+	}
 
 	// handle requests in queue
 	if (this->requests.empty() || !this->requests.front().is_end()) {
