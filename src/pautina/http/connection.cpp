@@ -88,13 +88,13 @@ void connection::handle_front_request()
 	if (resp.protocol == httpmodel::protocol::http_1_0) {
 		if (this->keep_alive) {
 			// append "Connection" header, replacing existing one
-			resp.headers.add(httpmodel::header::connection, std::string(keep_alive_header_value));
+			resp.headers.put(httpmodel::header::connection, std::string(keep_alive_header_value));
 		}
 	} else {
 		ASSERT(resp.protocol >= httpmodel::protocol::http_1_1)
 		if (!this->keep_alive) {
 			// append "Connection" header, replacing existing one
-			resp.headers.add(httpmodel::header::connection, std::string(close_header_value));
+			resp.headers.put(httpmodel::header::connection, std::string(close_header_value));
 		}
 	}
 
