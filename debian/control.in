@@ -1,0 +1,41 @@
+Source: libpautina
+Section: libs
+Priority: extra
+Maintainer: Ivan Gagis <igagis@gmail.com>
+Build-Depends: debhelper (>= 9), prorab, prorab-extra,
+		libc6-dev,
+		clang-format,
+		clang-tidy,
+		libtst-dev,
+		libutki-dev,
+		libhttpmodel-dev
+Build-Depends-Indep: doxygen
+Standards-Version: 3.9.2
+
+Package: libpautina$(soname)
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: cross-platform HTTP service C++ library.
+ HTTP service library.
+
+Package: libpautina$(soname)-dbgsrc
+Section: debug
+Architecture: any
+Depends: libpautina$(soname)-dbgsym (= ${binary:Version}), ${misc:Depends}
+Description: debugging sources for libpautina$(soname) package.
+
+Package: libpautina-dev
+Section: libdevel
+Architecture: any
+Depends: libhttpmodel-dev, libpautina$(soname) (= ${binary:Version}), ${misc:Depends}
+Suggests: libpautina-doc
+Description: cross-platform HTTP service C++ library.
+ HTTP service library.
+
+Package: libpautina-doc
+Section: doc
+Architecture: all
+Depends: ${misc:Depends}
+Description: documentation for libpautina library.
+ For more details see description to libpautina-dev package.
