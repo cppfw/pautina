@@ -9,6 +9,7 @@ class Libpautina < Formula
   depends_on "libtst" => :build
   depends_on "libutki"
   depends_on "libhttpmodel"
+  depends_on "libsetka"
 
   # use gmake here because otherwise homebrew uses default Mac's make which is of too old version 3.81
   def install
