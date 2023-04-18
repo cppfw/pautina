@@ -11,7 +11,7 @@ this_soname := $(shell cat $(d)soname.txt)
 
 this_srcs := $(call prorab-src-dir, .)
 
-this_ldlibs += -lnitki -lsetka -lurlmodel -lhttpmodel
+this_ldlibs += -lnitki -lopros -lsetka -lurlmodel -lhttpmodel
 
 $(eval $(prorab-build-lib))
 
