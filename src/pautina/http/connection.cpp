@@ -104,6 +104,7 @@ void connection::handle_front_request()
 	})
 	this->send(resp.to_bytes_no_body());
 	if (!resp.body.empty()) {
+		// TODO: add Content-Length header?
 		this->send(std::move(resp.body));
 	}
 
