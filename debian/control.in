@@ -8,6 +8,7 @@ Build-Depends: debhelper (>= 9), prorab, prorab-extra,
 		clang-tidy,
 		libtst-dev,
 		libutki-dev,
+		libnitki-dev,
 		libhttpmodel-dev
 Build-Depends-Indep: doxygen
 Standards-Version: 3.9.2
