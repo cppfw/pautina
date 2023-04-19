@@ -46,29 +46,34 @@ httpmodel::response connection::handle_request(const httpmodel::request& req)
 {
 	auto connection_header = req.headers.get(httpmodel::header::connection);
 
-	if (req.protocol == httpmodel::protocol::http_1_0) {
-		// check if connection is persistent
-		// Persistent connection spec: https://datatracker.ietf.org/doc/html/rfc7230#section-6.3
-		if (connection_header.has_value() && connection_header.value() == keep_alive_header_value) {
-			this->keep_alive = true;
-		} else {
-			this->keep_alive = false;
-		}
-	} else {
-		ASSERT(req.protocol >= httpmodel::protocol::http_1_1)
+	switch (req.protocol) {
+		case httpmodel::protocol::http_1_0:
+			// check if connection is persistent
+			// Persistent connection spec: https://datatracker.ietf.org/doc/html/rfc7230#section-6.3
+			if (connection_header.has_value() && connection_header.value() == keep_alive_header_value) {
+				this->keep_alive = true;
+			} else {
+				this->keep_alive = false;
+			}
+			break;
+		case httpmodel::protocol::http_1_1:
+			// check if connection is persistent
+			// Persistent connection spec: https://datatracker.ietf.org/doc/html/rfc7230#section-6.3
+			if (connection_header.has_value() && connection_header.value() == close_header_value) {
+				this->keep_alive = false;
+			} else {
+				this->keep_alive = true;
+			}
+			[[fallthrough]];
+		case httpmodel::protocol::http_2_0:
+			// HTTP 2.0 keeps TCP connection open until it is closed by client or server specific
+			// timeout elapses. So, no check for persistent connection-related headers.
 
-		if (!req.headers.get(httpmodel::header::host)) {
-			// HTTP/1.1+ request protocol requires 'Host' header, which is missing
-			return {req, httpmodel::status::http_400_bad_request};
-		}
-
-		// check if connection is persistent
-		// Persistent connection spec: https://datatracker.ietf.org/doc/html/rfc7230#section-6.3
-		if (connection_header.has_value() && connection_header.value() == close_header_value) {
-			this->keep_alive = false;
-		} else {
-			this->keep_alive = true;
-		}
+			if (!req.headers.get(httpmodel::header::host)) {
+				// HTTP/1.1+ request protocol requires 'Host' header, which is missing
+				return {req, httpmodel::status::http_400_bad_request};
+			}
+			break;
 	}
 
 	return this->owner.router.route(req);
@@ -85,17 +90,23 @@ void connection::handle_front_request()
 	// Handle persistent connection.
 	// In case client requested persistent connection, the server must append "Connection" header.
 	// Persistent connection spec: https://datatracker.ietf.org/doc/html/rfc7230#section-6.3
-	if (resp.protocol == httpmodel::protocol::http_1_0) {
-		if (this->keep_alive) {
-			// append "Connection" header, replacing existing one
-			resp.headers.put(httpmodel::header::connection, std::string(keep_alive_header_value));
-		}
-	} else {
-		ASSERT(resp.protocol >= httpmodel::protocol::http_1_1)
-		if (!this->keep_alive) {
-			// append "Connection" header, replacing existing one
-			resp.headers.put(httpmodel::header::connection, std::string(close_header_value));
-		}
+	switch (resp.protocol) {
+		case httpmodel::protocol::http_1_0:
+			if (this->keep_alive) {
+				// append "Connection" header, replacing existing one
+				resp.headers.put(httpmodel::header::connection, std::string(keep_alive_header_value));
+			}
+			break;
+		case httpmodel::protocol::http_1_1:
+			if (!this->keep_alive) {
+				// append "Connection" header, replacing existing one
+				resp.headers.put(httpmodel::header::connection, std::string(close_header_value));
+			}
+			break;
+		case httpmodel::protocol::http_2_0:
+			// HTTP 2.0 keeps TCP connection open until it is closed by client.
+			// Connection persistence headers are not used.
+			break;
 	}
 
 	// send the response
