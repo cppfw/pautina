@@ -26,7 +26,7 @@ SOFTWARE.
 
 #include "router.hpp"
 
-using namespace pautina::http;
+using namespace pautina;
 
 router::router(routes_type&& routes) :
 	routes(std::move(routes))

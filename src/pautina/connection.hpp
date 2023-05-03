@@ -29,77 +29,31 @@ SOFTWARE.
 #include <deque>
 
 #include <httpmodel/request_parser.hpp>
-#include <setka/tcp_socket.hpp>
-#include <utki/flags.hpp>
-#include <utki/span.hpp>
+
+#include "../tcpserver/connection.hpp"
+
+#include "server.hpp"
 
 namespace pautina {
 
-class connection_thread;
-
-class connection
+class connection : public tcpserver::connection
 {
-	friend class connection_thread;
+	std::deque<httpmodel::request_parser> requests;
 
-private:
-	setka::tcp_socket socket;
+	const pautina::server& owner;
 
-public:
-	connection(setka::tcp_socket&& socket);
+	void handle_front_request();
 
-	virtual ~connection() = default;
+	httpmodel::response handle_request(const httpmodel::request& req);
 
-private:
-	// initially connection is ready to receive data
-	utki::flags<opros::ready> status{opros::ready::read};
-
-	// stuff used in 'sending' state
-	std::deque<std::vector<uint8_t>> sending_queue;
-	size_t num_bytes_sent; // for front element of the seinding queue
-
-protected:
-	/**
-	 * @brief Turn on/off handle_received_data() notifications.
-	 * Not thread-safe.
-	 * @param can_receive - whether to turn on (true) or off (false) the handle_received_data() notifications.
-	 */
-	void set_can_receive_data(bool can_receive);
+	bool keep_alive = false;
 
 public:
-	/**
-	 * @return true if ready to handle more data.
-	 * @return true if not ready to handle more data.
-	 */
-	virtual void handle_data_received(utki::span<const uint8_t> data) = 0;
+	connection(setka::tcp_socket&& socket, const pautina::server& owner);
 
-	/**
-	 * @return true if ready to receive more data.
-	 * @return true if not ready to receive data.
-	 */
-	virtual void handle_all_data_sent() = 0;
+	void handle_data_received(utki::span<const uint8_t> data) override;
 
-	/**
-	 * @brief Check if send buffer is not empty.
-	 * Not thread-safe.
-	 * @return true if send buffer is not empty, i.e. some data is in process of being sent.
-	 * @return false otherwise.
-	 */
-	bool is_sending() const noexcept
-	{
-		return this->status.get(opros::ready::write);
-	}
-
-	/**
-	 * @brief Send data over the connection.
-	 * @param data - data to send.
-	 */
-	// TODO: should be thread-safe?
-	void send(std::vector<uint8_t>&& data);
-
-	/**
-	 * @brief Disconnect the connection.
-	 */
-	void disconnect();
+	void handle_all_data_sent() override;
 };
 
 } // namespace pautina

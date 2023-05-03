@@ -26,32 +26,170 @@ SOFTWARE.
 
 #include "connection.hpp"
 
+#include <utki/string.hpp>
+
 using namespace pautina;
 
-connection::connection(setka::tcp_socket&& socket) :
-	socket(std::move(socket))
+using namespace std::string_literals;
+
+namespace {
+const std::string keep_alive_header_value = "keep-alive"s;
+const std::string close_header_value = "close"s;
+} // namespace
+
+connection::connection(setka::tcp_socket&& socket, const pautina::server& owner) :
+	tcpserver::connection(std::move(socket)),
+	owner(owner)
 {}
 
-void connection::send(std::vector<uint8_t>&& data)
+httpmodel::response connection::handle_request(const httpmodel::request& req)
 {
-	if (this->sending_queue.empty()) {
-		this->num_bytes_sent = 0;
+	auto connection_header = req.headers.get(httpmodel::header::connection);
+
+	switch (req.protocol) {
+		case httpmodel::protocol::http_1_0:
+			// check if connection is persistent
+			// Persistent connection spec: https://datatracker.ietf.org/doc/html/rfc7230#section-6.3
+			if (connection_header.has_value() && connection_header.value() == keep_alive_header_value) {
+				this->keep_alive = true;
+			} else {
+				this->keep_alive = false;
+			}
+			break;
+		case httpmodel::protocol::http_1_1:
+			// check if connection is persistent
+			// Persistent connection spec: https://datatracker.ietf.org/doc/html/rfc7230#section-6.3
+			if (connection_header.has_value() && connection_header.value() == close_header_value) {
+				this->keep_alive = false;
+			} else {
+				this->keep_alive = true;
+			}
+			[[fallthrough]];
+		case httpmodel::protocol::http_2_0:
+			// HTTP 2.0 keeps TCP connection open until it is closed by client or server specific
+			// timeout elapses. So, no check for persistent connection-related headers.
+
+			if (!req.headers.get(httpmodel::header::host)) {
+				// HTTP/1.1+ request protocol requires 'Host' header, which is missing
+				return {req, httpmodel::status::http_400_bad_request};
+			}
+			break;
 	}
 
-	this->sending_queue.push_back(std::move(data));
-
-	this->status.set(opros::ready::write);
+	return this->owner.router.route(req);
 }
 
-void connection::set_can_receive_data(bool can_receive)
+void connection::handle_front_request()
 {
-	this->status.set(opros::ready::read, can_receive);
-}
+	ASSERT(!this->requests.empty())
+	ASSERT(this->requests.front().is_end())
 
-void connection::disconnect()
-{
-	LOG([](auto& o) {
-		o << "DISCONNECT" << std::endl;
+	auto resp = this->handle_request(this->requests.front().request);
+	this->requests.pop_front();
+
+	// Handle persistent connection.
+	// In case client requested persistent connection, the server must append "Connection" header.
+	// Persistent connection spec: https://datatracker.ietf.org/doc/html/rfc7230#section-6.3
+	switch (resp.protocol) {
+		case httpmodel::protocol::http_1_0:
+			if (this->keep_alive) {
+				// append "Connection" header, replacing existing one
+				resp.headers.put(httpmodel::header::connection, std::string(keep_alive_header_value));
+			}
+			break;
+		case httpmodel::protocol::http_1_1:
+			if (!this->keep_alive) {
+				// append "Connection" header, replacing existing one
+				resp.headers.put(httpmodel::header::connection, std::string(close_header_value));
+			}
+			break;
+		case httpmodel::protocol::http_2_0:
+			// HTTP 2.0 keeps TCP connection open until it is closed by client.
+			// Connection persistence headers are not used.
+			break;
+	}
+
+	// send the response
+	LOG([&](auto& o) {
+		o << "sending http response, status = " << to_string(resp.status) << std::endl;
 	})
-	this->socket.disconnect();
+	this->send(resp.to_bytes_no_body());
+	if (!resp.body.empty()) {
+		resp.headers.put(httpmodel::header::content_length, utki::to_string(resp.body.size()));
+		this->send(std::move(resp.body));
+	}
+
+	// if not all requests have been handled wait with receiving more data
+	if (!this->requests.empty() && this->requests.front().is_end()) {
+		ASSERT(this->is_sending())
+		this->set_can_receive_data(false);
+	}
+}
+
+void connection::handle_data_received(utki::span<const uint8_t> data)
+{
+	ASSERT(!data.empty())
+
+	LOG([&](auto& o) {
+		o << "connection::handle_received_data(): " << utki::make_string(data) << std::endl;
+	})
+
+	if (this->requests.empty()) {
+		this->requests.emplace_back();
+	}
+
+	while (!data.empty()) {
+		ASSERT(!this->requests.empty())
+		ASSERT(!this->requests.back().is_end())
+
+		try {
+			data = this->requests.back().feed(data);
+		} catch (std::invalid_argument& e) {
+			LOG([&](auto& o) {
+				o << "std::invalid_argument while parsing http request: " << e.what() << "\n";
+				o << "data = " << utki::make_string(data) << std::endl;
+			})
+			this->disconnect();
+			return;
+		}
+
+		if (this->requests.back().is_end()) {
+			LOG([&](auto& o) {
+				o << "http request parsed" << std::endl;
+			})
+			this->requests.emplace_back();
+		}
+	}
+
+	ASSERT(!this->requests.empty())
+
+	// handle parsed requests
+	if (this->requests.front().is_end()) {
+		if (!this->is_sending()) {
+			// handling request will send the response, so we only want to
+			// send something unless there is no sending in progress
+			this->handle_front_request();
+		}
+	}
+}
+
+void connection::handle_all_data_sent()
+{
+	ASSERT(!this->is_sending())
+
+	// If the connection is not persistent, then close it after response has been sent.
+	if (!this->keep_alive) {
+		this->disconnect();
+		return;
+	}
+
+	// handle requests in queue
+	if (this->requests.empty() || !this->requests.front().is_end()) {
+		this->set_can_receive_data(true);
+	} else {
+		ASSERT(!this->requests.empty())
+		ASSERT(this->requests.front().is_end())
+
+		this->handle_front_request();
+	}
 }

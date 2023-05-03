@@ -24,28 +24,34 @@ SOFTWARE.
 
 /* ================ LICENSE END ================ */
 
-#pragma once
+#include "connection.hpp"
 
-#include <httpmodel/response.hpp>
+using namespace tcpserver;
 
-#include "../server.hpp"
+connection::connection(setka::tcp_socket&& socket) :
+	socket(std::move(socket))
+{}
 
-#include "router.hpp"
-
-namespace pautina::http {
-
-class server : public pautina::server
+void connection::send(std::vector<uint8_t>&& data)
 {
-	friend class connection;
+	if (this->sending_queue.empty()) {
+		this->num_bytes_sent = 0;
+	}
 
-	pautina::http::router router;
+	this->sending_queue.push_back(std::move(data));
 
-public:
-	struct configuration : public pautina::server::configuration {};
+	this->status.set(opros::ready::write);
+}
 
-	server(const configuration& config, router::routes_type&& routes);
+void connection::set_can_receive_data(bool can_receive)
+{
+	this->status.set(opros::ready::read, can_receive);
+}
 
-	utki::shared_ref<pautina::connection> spawn_connection(setka::tcp_socket&& socket) const override;
-};
-
-} // namespace pautina::http
+void connection::disconnect()
+{
+	LOG([](auto& o) {
+		o << "DISCONNECT" << std::endl;
+	})
+	this->socket.disconnect();
+}

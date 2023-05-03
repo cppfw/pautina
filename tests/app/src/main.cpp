@@ -1,12 +1,12 @@
 #include <iostream>
 
-#include <pautina/http/server.hpp>
+#include <pautina/server.hpp>
 
 int main(int argc, const char** argv)
 {
 	uint16_t port = 8080;
 
-	pautina::http::server server(pautina::http::server::configuration{{.port = port}}, {});
+	pautina::server server(pautina::server::configuration{{.port = port}}, {});
 
 	std::cout << "app: server is listening on port " << port << std::endl;
 

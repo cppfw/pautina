@@ -24,18 +24,44 @@ SOFTWARE.
 
 /* ================ LICENSE END ================ */
 
-#include "server.hpp"
+#pragma once
 
-#include "connection.hpp"
+#include <list>
+#include <string>
 
-using namespace pautina::http;
+#include <nitki/loop_thread.hpp>
+#include <setka/init_guard.hpp>
+#include <setka/tcp_server_socket.hpp>
 
-server::server(const configuration& config, router::routes_type&& routes) :
-	pautina::server(config),
-	router(std::move(routes))
-{}
+#include "connection_thread.hpp"
 
-utki::shared_ref<pautina::connection> server::spawn_connection(setka::tcp_socket&& socket) const
+namespace tcpserver {
+
+class server : public nitki::loop_thread
 {
-	return utki::make_shared<connection>(std::move(socket), *this);
-}
+	friend class connection_thread;
+
+	std::shared_ptr<utki::destructable> setka_init_guard = setka::get_init_guard_reference();
+
+	setka::tcp_server_socket accept_socket;
+
+	std::list<connection_thread> threads;
+
+	void spawn_thread(setka::tcp_socket&& socket);
+
+	void reclaim_thread(connection_thread& t);
+
+	std::optional<uint32_t> on_loop() override;
+
+public:
+	struct configuration {
+		uint16_t port = 80;
+	};
+
+	server(const configuration& config);
+	~server() override;
+
+	virtual utki::shared_ref<connection> spawn_connection(setka::tcp_socket&& socket) const = 0;
+};
+
+} // namespace pautina

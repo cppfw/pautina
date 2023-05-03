@@ -36,7 +36,7 @@ SOFTWARE.
 
 #include "connection.hpp"
 
-namespace pautina {
+namespace tcpserver {
 
 class server;
 
@@ -48,7 +48,7 @@ class connection_thread : public nitki::loop_thread
 	std::list<connection_thread>::iterator owner_iter;
 
 	// TODO: handle several connections
-	std::shared_ptr<pautina::connection> connection;
+	std::shared_ptr<tcpserver::connection> connection;
 
 public:
 	connection_thread(server& owner);
@@ -56,7 +56,7 @@ public:
 
 	std::optional<uint32_t> on_loop() override;
 
-	void push(const utki::shared_ref<pautina::connection>& conn);
+	void push(const utki::shared_ref<tcpserver::connection>& conn);
 };
 
 } // namespace pautina

@@ -26,34 +26,37 @@ SOFTWARE.
 
 #pragma once
 
-#include <deque>
+#include <functional>
+#include <map>
 
-#include <httpmodel/request_parser.hpp>
+#include <httpmodel/request.hpp>
+#include <httpmodel/response.hpp>
+#include <utki/span.hpp>
 
-#include "../connection.hpp"
+namespace pautina {
 
-#include "server.hpp"
+using route_handler_type = std::function< //
+	httpmodel::response( //
+		const httpmodel::request& request, //
+		utki::span<const std::string> subpath //
+	) //
+	>;
 
-namespace pautina::http {
-
-class connection : public pautina::connection
+class router
 {
-	std::deque<httpmodel::request_parser> requests;
+public:
+	using routes_type = std::map<std::vector<std::string>, route_handler_type, urlmodel::path_less>;
 
-	const pautina::http::server& owner;
-
-	void handle_front_request();
-
-	httpmodel::response handle_request(const httpmodel::request& req);
-
-	bool keep_alive = false;
+private:
+	const routes_type routes;
 
 public:
-	connection(setka::tcp_socket&& socket, const pautina::http::server& owner);
+	router(routes_type&& routes);
 
-	void handle_data_received(utki::span<const uint8_t> data) override;
-
-	void handle_all_data_sent() override;
+	// thread-safe:
+	// it is ok to call this method from concurrent threads, because it does not modify
+	// the routes map
+	httpmodel::response route(const httpmodel::request& req) const;
 };
 
-} // namespace pautina::http
+} // namespace pautina

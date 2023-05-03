@@ -24,39 +24,53 @@ SOFTWARE.
 
 /* ================ LICENSE END ================ */
 
-#pragma once
+#include "server.hpp"
 
-#include <functional>
-#include <map>
+using namespace tcpserver;
 
-#include <httpmodel/request.hpp>
-#include <httpmodel/response.hpp>
-#include <utki/span.hpp>
-
-namespace pautina::http {
-
-using route_handler_type = std::function< //
-	httpmodel::response( //
-		const httpmodel::request& request, //
-		utki::span<const std::string> subpath //
-	) //
-	>;
-
-class router
+server::server(const configuration& config) :
+	nitki::loop_thread(1),
+	accept_socket(config.port)
 {
-public:
-	using routes_type = std::map<std::vector<std::string>, route_handler_type, urlmodel::path_less>;
+	this->wait_set.add(this->accept_socket, opros::ready::read, &this->accept_socket);
+}
 
-private:
-	const routes_type routes;
+server::~server()
+{
+	this->wait_set.remove(this->accept_socket);
+}
 
-public:
-	router(routes_type&& routes);
+std::optional<uint32_t> server::on_loop()
+{
+	for (const auto& t : this->wait_set.get_triggered()) {
+		if (t.user_data == &this->accept_socket) {
+			auto socket = this->accept_socket.accept();
 
-	// thread-safe:
-	// it is ok to call this method from concurrent threads, because it does not modify
-	// the routes map
-	httpmodel::response route(const httpmodel::request& req) const;
-};
+			LOG([](auto& o) {
+				o << "connection accepted" << std::endl;
+			})
+			this->spawn_thread(std::move(socket));
+		}
+	}
 
-} // namespace pautina::http
+	return {};
+}
+
+void server::spawn_thread(setka::tcp_socket&& socket)
+{
+	auto& thread = this->threads.emplace_back(*this);
+	thread.owner_iter = std::prev(this->threads.end());
+	thread.start();
+
+	thread.push(this->spawn_connection(std::move(socket)));
+}
+
+void server::reclaim_thread(connection_thread& t)
+{
+	t.quit();
+	// TODO: push to killer thread
+	this->push_back([i = t.owner_iter, this]() {
+		i->join();
+		this->threads.erase(i);
+	});
+}

@@ -26,42 +26,26 @@ SOFTWARE.
 
 #pragma once
 
-#include <list>
-#include <string>
+#include <httpmodel/response.hpp>
 
-#include <nitki/loop_thread.hpp>
-#include <setka/init_guard.hpp>
-#include <setka/tcp_server_socket.hpp>
+#include "../tcpserver/server.hpp"
 
-#include "connection_thread.hpp"
+#include "router.hpp"
 
 namespace pautina {
 
-class server : public nitki::loop_thread
+class server : public tcpserver::server
 {
-	friend class connection_thread;
+	friend class connection;
 
-	std::shared_ptr<utki::destructable> setka_init_guard = setka::get_init_guard_reference();
-
-	setka::tcp_server_socket accept_socket;
-
-	std::list<connection_thread> threads;
-
-	void spawn_thread(setka::tcp_socket&& socket);
-
-	void reclaim_thread(connection_thread& t);
-
-	std::optional<uint32_t> on_loop() override;
+	pautina::router router;
 
 public:
-	struct configuration {
-		uint16_t port = 80;
-	};
+	struct configuration : public tcpserver::server::configuration {};
 
-	server(const configuration& config);
-	~server() override;
+	server(const configuration& config, router::routes_type&& routes);
 
-	virtual utki::shared_ref<connection> spawn_connection(setka::tcp_socket&& socket) const = 0;
+	utki::shared_ref<tcpserver::connection> spawn_connection(setka::tcp_socket&& socket) const override;
 };
 
 } // namespace pautina

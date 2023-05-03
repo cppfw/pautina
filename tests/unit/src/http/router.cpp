@@ -1,7 +1,7 @@
 #include <tst/set.hpp>
 #include <tst/check.hpp>
 
-#include <pautina/http/router.hpp>
+#include <pautina/router.hpp>
 
 namespace{
 tst::set set("http__router", [](tst::suite& suite){
@@ -14,7 +14,7 @@ tst::set set("http__router", [](tst::suite& suite){
             {"blah", "blah1", "blah2"}
         },
         [](const auto& p){
-            pautina::http::router r({});
+            pautina::router r({});
 
             auto resp = r.route({
                 .url = {
@@ -39,8 +39,8 @@ tst::set set("http__router", [](tst::suite& suite){
 
             std::vector<std::string> the_subpath;
 
-            pautina::http::router r(
-                pautina::http::router::routes_type{
+            pautina::router r(
+                pautina::router::routes_type{
                     {
                         {},
                         [&](const auto& req, auto subpath){
@@ -76,8 +76,8 @@ tst::set set("http__router", [](tst::suite& suite){
 
             std::vector<std::string> the_subpath;
 
-            pautina::http::router r(
-                pautina::http::router::routes_type{
+            pautina::router r(
+                pautina::router::routes_type{
                     {
                         {"blah"},
                         [&](const auto& req, auto subpath){

@@ -28,7 +28,7 @@ SOFTWARE.
 
 #include "server.hpp"
 
-using namespace pautina;
+using namespace tcpserver;
 
 connection_thread::connection_thread(server& owner) :
 	nitki::loop_thread(1),
@@ -43,7 +43,7 @@ connection_thread::~connection_thread()
 	})
 }
 
-void connection_thread::push(const utki::shared_ref<pautina::connection>& conn)
+void connection_thread::push(const utki::shared_ref<tcpserver::connection>& conn)
 {
 	this->push_back([this, c = conn]() mutable {
 		ASSERT(!this->connection)
@@ -79,7 +79,7 @@ std::optional<uint32_t> connection_thread::on_loop()
 			return {};
 		}
 
-		auto c = reinterpret_cast<pautina::connection*>(t.user_data);
+		auto c = reinterpret_cast<tcpserver::connection*>(t.user_data);
 
 		if (c->status.get(opros::ready::read) && t.flags.get(opros::ready::read)) {
 			// data has arrived to socket and connection is able to receive it
