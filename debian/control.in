@@ -30,7 +30,9 @@ Description: debugging sources for libpautina$(soname) package.
 Package: libpautina-dev
 Section: libdevel
 Architecture: any
-Depends: libhttpmodel-dev, libpautina$(soname) (= ${binary:Version}), ${misc:Depends}
+Depends:
+	libhttpmodel-dev,
+	libpautina$(soname) (= ${binary:Version}), ${misc:Depends}
 Suggests: libpautina-doc
 Description: cross-platform HTTP service C++ library.
  HTTP service library.

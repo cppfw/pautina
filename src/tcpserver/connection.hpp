@@ -28,7 +28,6 @@ SOFTWARE.
 
 #include <deque>
 
-#include <httpmodel/request_parser.hpp>
 #include <setka/tcp_socket.hpp>
 #include <utki/flags.hpp>
 #include <utki/span.hpp>
