@@ -31,6 +31,8 @@ Package: libpautina-dev
 Section: libdevel
 Architecture: any
 Depends:
+	libnitki-dev,
+	libsetka-dev,
 	libhttpmodel-dev,
 	libpautina$(soname) (= ${binary:Version}), ${misc:Depends}
 Suggests: libpautina-doc
