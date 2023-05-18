@@ -40,7 +40,11 @@ httpmodel::response router::route(const httpmodel::request& req) const
 		// std::cout << "path = " << path << std::endl;
 		auto i = this->routes.find(path);
 		if (i != this->routes.end()) {
-			return i->second(req, utki::make_span(req.url.path).subspan(path.size()));
+			try {
+				return i->second(req, utki::make_span(req.url.path).subspan(path.size()));
+			} catch (...) {
+				return {req, httpmodel::status::http_500_internal_server_error};
+			}
 		}
 
 		if (path.empty()) {
