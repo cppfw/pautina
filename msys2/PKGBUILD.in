@@ -28,7 +28,6 @@ license=('MIT')
 groups=()
 
 depends=(
-	"${pkgPrefix}utki"
 	"${pkgPrefix}httpmodel"
 	"${pkgPrefix}tcpserver"
 )
