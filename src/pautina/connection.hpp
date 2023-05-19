@@ -29,8 +29,7 @@ SOFTWARE.
 #include <deque>
 
 #include <httpmodel/request_parser.hpp>
-
-#include "../tcpserver/connection.hpp"
+#include <tcpserver/connection.hpp>
 
 #include "server.hpp"
 
