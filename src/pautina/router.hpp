@@ -51,7 +51,7 @@ private:
 	const routes_type routes;
 
 public:
-	router(routes_type&& routes);
+	router(routes_type routes);
 
 	// thread-safe:
 	// it is ok to call this method from concurrent threads, because it does not modify

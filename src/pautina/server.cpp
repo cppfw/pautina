@@ -30,7 +30,7 @@ SOFTWARE.
 
 using namespace pautina;
 
-server::server(const configuration& config, router::routes_type&& routes) :
+server::server(const configuration& config, router::routes_type routes) :
 	tcpserver::server(config),
 	router(std::move(routes))
 {}

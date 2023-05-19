@@ -43,7 +43,7 @@ class server : public tcpserver::server
 public:
 	struct configuration : public tcpserver::server::configuration {};
 
-	server(const configuration& config, router::routes_type&& routes);
+	server(const configuration& config, router::routes_type routes);
 
 	utki::shared_ref<tcpserver::connection> spawn_connection(setka::tcp_socket&& socket) const override;
 };

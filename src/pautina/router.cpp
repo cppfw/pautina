@@ -28,7 +28,7 @@ SOFTWARE.
 
 using namespace pautina;
 
-router::router(routes_type&& routes) :
+router::router(routes_type routes) :
 	routes(std::move(routes))
 {}
 
