@@ -30,7 +30,7 @@ groups=()
 depends=(
 	"${pkgPrefix}utki"
 	"${pkgPrefix}httpmodel"
-	"${pkgPrefix}setka"
+	"${pkgPrefix}tcpserver"
 )
 
 makedepends=(

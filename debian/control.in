@@ -7,9 +7,7 @@ Build-Depends: debhelper (>= 9), prorab, prorab-extra,
 		clang-format,
 		clang-tidy,
 		libtst-dev,
-		libutki-dev,
-		libnitki-dev,
-		libsetka-dev,
+		libtcpserver-dev,
 		libhttpmodel-dev
 Build-Depends-Indep: doxygen
 Standards-Version: 3.9.2
@@ -31,8 +29,7 @@ Package: libpautina-dev
 Section: libdevel
 Architecture: any
 Depends:
-	libnitki-dev,
-	libsetka-dev,
+	libtcpserver-dev,
 	libhttpmodel-dev,
 	libpautina$(soname) (= ${binary:Version}), ${misc:Depends}
 Suggests: libpautina-doc
