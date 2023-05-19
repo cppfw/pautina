@@ -15,7 +15,7 @@ this_libpautina := ../../src/out/$(c)/libpautina$(dot_so)
 this_cxxflags += -I ../../src
 this_ldflags += -L ../../src/out/$(c)
 
-this_ldlibs += $(this_libpautina) -lnitki
+this_ldlibs += $(this_libpautina) -ltcpserver
 
 $(eval $(prorab-build-app))
 $(eval $(call prorab-depend, $(prorab_this_name), $(this_libpautina)))
