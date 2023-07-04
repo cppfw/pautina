@@ -4,7 +4,7 @@
 #include <pautina/router.hpp>
 
 namespace{
-tst::set set("http__router", [](tst::suite& suite){
+const tst::set set("http__router", [](tst::suite& suite){
     suite.add<std::vector<std::string>>(
         "empty_route_list",
         {
@@ -97,7 +97,10 @@ tst::set set("http__router", [](tst::suite& suite){
             });
 
             tst::check(called, SL);
-            tst::check_eq(utki::make_span(const_cast<const decltype(the_subpath)&>(the_subpath)), utki::make_span(p).subspan(1), SL);
+
+            const auto& the_subpath_const_ref = the_subpath;
+
+            tst::check_eq(utki::make_span(the_subpath_const_ref), utki::make_span(p).subspan(1), SL);
             tst::check(resp.status == httpmodel::status::http_200_ok, SL);
         }
     );
