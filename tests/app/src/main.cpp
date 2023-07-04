@@ -4,7 +4,7 @@
 
 int main(int argc, const char** argv)
 {
-	uint16_t port = 8080;
+	constexpr auto port = 8080;
 
 	pautina::server server(pautina::server::configuration{{.port = port}}, {});
 
