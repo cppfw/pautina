@@ -1,3 +1,9 @@
+libpautina (0.1.8) unstable; urgency=medium
+
+  * aptian
+
+ -- Ivan Gagis <igagis@gmail.com>  Fri, 01 Mar 2024 18:30:49 +0200
+
 libpautina (0.1.7) unstable; urgency=medium
 
   * fix lint issues
