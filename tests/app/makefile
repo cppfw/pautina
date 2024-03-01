@@ -12,7 +12,7 @@ this_srcs := $(call prorab-src-dir, src)
 
 this_libpautina := ../../src/out/$(c)/libpautina$(dot_so)
 
-this_cxxflags += -I ../../src
+this_cxxflags += -isystem ../../src
 this_ldflags += -L ../../src/out/$(c)
 
 this_ldlibs += $(this_libpautina) -ltcpserver -lnitki

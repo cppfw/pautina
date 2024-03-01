@@ -21,7 +21,7 @@ Description: cross-platform HTTP service C++ library.
 
 Package: libpautina$(soname)-dbgsrc
 Section: debug
-Architecture: any
+Architecture: all
 Depends: libpautina$(soname)-dbgsym (= ${binary:Version}), ${misc:Depends}
 Description: debugging sources for libpautina$(soname) package.
 
