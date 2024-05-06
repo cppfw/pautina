@@ -1,3 +1,9 @@
+libpautina (0.1.9) unstable; urgency=medium
+
+  * fix homebrew packaging
+
+ -- Ivan Gagis <igagis@gmail.com>  Mon, 06 May 2024 15:50:55 +0300
+
 libpautina (0.1.8) unstable; urgency=medium
 
   * aptian
