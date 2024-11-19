@@ -1,3 +1,9 @@
+libpautina (0.1.10) unstable; urgency=medium
+
+  * ubuntu nobble build
+
+ -- Ivan Gagis <igagis@gmail.com>  Tue, 19 Nov 2024 23:41:58 +0200
+
 libpautina (0.1.9) unstable; urgency=medium
 
   * fix homebrew packaging
