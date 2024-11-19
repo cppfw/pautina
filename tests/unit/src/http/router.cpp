@@ -100,7 +100,7 @@ const tst::set set("http__router", [](tst::suite& suite){
 
             const auto& the_subpath_const_ref = the_subpath;
 
-            tst::check_eq(utki::make_span(the_subpath_const_ref), utki::make_span(p).subspan(1), SL);
+            tst::check(utki::deep_equals(utki::make_span(the_subpath_const_ref), utki::make_span(p).subspan(1)), SL);
             tst::check(resp.status == httpmodel::status::http_200_ok, SL);
         }
     );
