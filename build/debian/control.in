@@ -15,30 +15,46 @@ Standards-Version: 3.9.2
 Package: libpautina$(soname)
 Section: libs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends:
+	${shlibs:Depends},
+	${misc:Depends}
 Description: cross-platform HTTP service C++ library.
- HTTP service library.
+	HTTP service library.
+
+Package: libpautina-dbg$(soname)
+Section: libs
+Architecture: any
+Depends:
+	${shlibs:Depends},
+	${misc:Depends}
+Description: cross-platform HTTP service C++ library.
+	Debug version of libpautina.
 
 Package: libpautina$(soname)-dbgsrc
 Section: debug
 Architecture: all
-Depends: libpautina$(soname)-dbgsym (= ${binary:Version}), ${misc:Depends}
+Depends:
+	libpautina$(soname)-dbgsym (= ${binary:Version}),
+	libpautina-dbg$(soname)-dbgsym (= ${binary:Version}),
+	${misc:Depends}
 Description: debugging sources for libpautina$(soname) package.
 
 Package: libpautina-dev
 Section: libdevel
 Architecture: any
 Depends:
+	libpautina$(soname) (= ${binary:Version}),
+	libpautina-dbg$(soname) (= ${binary:Version}),
+	${misc:Depends},
 	libtcpserver-dev,
-	libhttpmodel-dev,
-	libpautina$(soname) (= ${binary:Version}), ${misc:Depends}
+	libhttpmodel-dev
 Suggests: libpautina-doc
 Description: cross-platform HTTP service C++ library.
- HTTP service library.
+	HTTP service library.
 
 Package: libpautina-doc
 Section: doc
 Architecture: all
 Depends: ${misc:Depends}
 Description: documentation for libpautina library.
- For more details see description to libpautina-dev package.
+	For more details see description to libpautina-dev package.

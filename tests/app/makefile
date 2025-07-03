@@ -10,20 +10,19 @@ this_name := app
 
 this_srcs := $(call prorab-src-dir, src)
 
-this_libpautina := ../../src/out/$(c)/libpautina$(dot_so)
-
 this_cxxflags += -isystem ../../src
-this_ldflags += -L ../../src/out/$(c)
 
-this_ldlibs += $(this_libpautina) -ltcpserver -lnitki
+this_ldlibs += -l tcpserver$(this_dbg)
+this_ldlibs += -l nitki$(this_dbg)
+
+this_ldlibs += ../../src/out/$(c)/libpautina$(this_dbg)$(dot_so)
 
 $(eval $(prorab-build-app))
-$(eval $(call prorab-depend, $(prorab_this_name), $(this_libpautina)))
 
 this_run_name := $(this_name)
 this_test_cmd := $(prorab_this_name)
 this_test_deps := $(prorab_this_name)
-this_test_ld_path := $(dir $(this_libpautina))
+this_test_ld_path := ../../src/out/$(c)
 $(eval $(prorab-run))
 
 $(eval $(prorab-clang-format))
