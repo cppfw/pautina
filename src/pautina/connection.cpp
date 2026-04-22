@@ -81,8 +81,8 @@ httpmodel::response connection::handle_request(const httpmodel::request& req)
 
 void connection::handle_front_request()
 {
-	ASSERT(!this->requests.empty())
-	ASSERT(this->requests.front().is_end())
+	utki::assert(!this->requests.empty(), SL);
+	utki::assert(this->requests.front().is_end(), SL);
 
 	auto resp = this->handle_request(this->requests.front().request);
 	this->requests.pop_front();
@@ -110,9 +110,9 @@ void connection::handle_front_request()
 	}
 
 	// send the response
-	LOG([&](auto& o) {
+	utki::log_debug([&](auto& o) {
 		o << "sending http response, status = " << to_string(resp.status) << std::endl;
-	})
+	});
 	this->send(resp.to_bytes_no_body());
 	if (!resp.body.empty()) {
 		resp.headers.put(httpmodel::header::content_length, utki::to_string(resp.body.size()));
@@ -121,14 +121,14 @@ void connection::handle_front_request()
 
 	// if not all requests have been handled wait with receiving more data
 	if (!this->requests.empty() && this->requests.front().is_end()) {
-		ASSERT(this->is_sending())
+		utki::assert(this->is_sending(), SL);
 		this->set_can_receive_data(false);
 	}
 }
 
 void connection::handle_data_received(utki::span<const uint8_t> data)
 {
-	ASSERT(!data.empty())
+	utki::assert(!data.empty(), SL);
 
 	LOG([&](auto& o) {
 		o << "connection::handle_received_data(): " << utki::make_string(data) << std::endl;
@@ -139,29 +139,29 @@ void connection::handle_data_received(utki::span<const uint8_t> data)
 	}
 
 	while (!data.empty()) {
-		ASSERT(!this->requests.empty())
-		ASSERT(!this->requests.back().is_end())
+		utki::assert(!this->requests.empty(), SL);
+		utki::assert(!this->requests.back().is_end(), SL);
 
 		try {
 			data = this->requests.back().feed(data);
 		} catch (std::invalid_argument& e) {
-			LOG([&](auto& o) {
+			utki::log_debug([&](auto& o) {
 				o << "std::invalid_argument while parsing http request: " << e.what() << "\n";
 				o << "data = " << utki::make_string(data) << std::endl;
-			})
+			});
 			this->disconnect();
 			return;
 		}
 
 		if (this->requests.back().is_end()) {
-			LOG([&](auto& o) {
+			utki::log_debug([&](auto& o) {
 				o << "http request parsed" << std::endl;
-			})
+			});
 			this->requests.emplace_back();
 		}
 	}
 
-	ASSERT(!this->requests.empty())
+	utki::assert(!this->requests.empty(), SL);
 
 	// handle parsed requests
 	if (this->requests.front().is_end()) {
@@ -175,7 +175,7 @@ void connection::handle_data_received(utki::span<const uint8_t> data)
 
 void connection::handle_all_data_sent()
 {
-	ASSERT(!this->is_sending())
+	utki::assert(!this->is_sending(), SL);
 
 	// If the connection is not persistent, then close it after response has been sent.
 	if (!this->keep_alive) {
@@ -187,8 +187,8 @@ void connection::handle_all_data_sent()
 	if (this->requests.empty() || !this->requests.front().is_end()) {
 		this->set_can_receive_data(true);
 	} else {
-		ASSERT(!this->requests.empty())
-		ASSERT(this->requests.front().is_end())
+		utki::assert(!this->requests.empty(), SL);
+		utki::assert(this->requests.front().is_end(), SL);
 
 		this->handle_front_request();
 	}
