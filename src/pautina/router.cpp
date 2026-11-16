@@ -51,7 +51,7 @@ httpmodel::response router::route(const httpmodel::request& req) const
 			break;
 		}
 
-		ASSERT(path.size() != 0)
+		utki::assert(path.size() != 0, SL);
 
 		path = path.subspan(0, path.size() - 1);
 	}
